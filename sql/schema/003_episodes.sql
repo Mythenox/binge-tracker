@@ -1,13 +1,15 @@
 -- +goose Up
 CREATE TABLE episodes(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    episode_number INTEGER UNIQUE NOT NULL,
+    episode_number INTEGER NOT NULL,
+    filepath TEXT UNIQUE NOT NULL,
     viewtime FLOAT NOT NULL,
     runtime FLOAT NOT NULL,
     watched BOOLEAN NOT NULL,
-    season_id UUID NOT NULL,
-    FOREIGN KEY (season_id)
-    REFERENCES seasons (id)
+    show_title TEXT NOT NULL,
+    season_number INTEGER NOT NULL,
+    PRIMARY KEY (show_title, season_number, episode_number),
+    FOREIGN KEY (show_title, season_number)
+    REFERENCES seasons (show_title, season_number)
     ON DELETE CASCADE
 );
 
