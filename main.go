@@ -19,12 +19,6 @@ type MpvEvent struct {
 func main() {
 	socketPath := "/tmp/my-app.sock"
 
-	/*err := os.Remove(socketPath)
-	if err != nil && !os.IsNotExist(err) {
-		log.Fatalf("Failed to remove old socket: %v", err)
-	}
-	*/
-
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
 		log.Fatalf("Unable to connect to socket: %v", err)
