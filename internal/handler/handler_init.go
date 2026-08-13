@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -17,24 +16,22 @@ import (
 	"github.com/mythenox/binge-tracker/internal/database"
 )
 
+type ShowExistsError struct{}
+
+func (*ShowExistsError) Error() string {
+	return "The specified show has already been initialized"
+}
+
 // initiate a show to be tracked. requires show name, season to be added, and dirpath of the season.
 // ex: bingetracker init "twin peaks" s01 videos/twin-peaks-s01
 // automatically adds all episodes found in given directory
 
-func HandlerInit(s *app.State, cmd app.Command) error {
-	if len(cmd.Args) != 3 {
-		return fmt.Errorf("Usage: %s <show title> <season number> <season directory path>", cmd.Name)
-	}
-
-	showTitle, seasonArg, seasonDirPath := cmd.Args[0], cmd.Args[1], cmd.Args[2]
-
-	seasonArg = CleanInput(seasonArg, "s")
-
-	seasonNumber, err := strconv.Atoi(seasonArg)
-	if err != nil {
-		return err
-	}
-
+func HandlerInit(c context.Context,
+	s *app.State,
+	showTitle string,
+	seasonNumber int,
+	seasonDirPath string,
+) error {
 	dirEntries, err := os.ReadDir(seasonDirPath)
 	if err != nil {
 		return err
@@ -43,12 +40,8 @@ func HandlerInit(s *app.State, cmd app.Command) error {
 	// check if show already exists in database
 
 	_, err = s.DB.GetShow(context.Background(), showTitle)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			fmt.Printf("The show %s has already been initialized.\n", showTitle)
-			return nil
-		}
-		return err
+	if err == nil {
+		return new(ShowExistsError)
 	}
 
 	var episodes []database.AddEpisodeParams
