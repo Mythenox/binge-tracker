@@ -3,3 +3,6 @@
 
 # other
 /samples/*
+
+#configs
+*.json

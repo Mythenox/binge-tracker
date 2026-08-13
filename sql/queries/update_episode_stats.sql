@@ -1,4 +1,4 @@
--- name: UpdateViewTime :one
+-- name: UpdateEpisodeStats :one
 UPDATE episodes
 SET viewtime = sqlc.arg(viewtime),
     watched = sqlc.arg(watched)

@@ -1,4 +1,4 @@
-package internal
+package listen
 
 import (
 	"encoding/json"
@@ -9,14 +9,14 @@ import (
 	"strconv"
 )
 
-type MpvEvent struct {
+type mpvEvent struct {
 	Event string   `json:"event"`
 	Args  []string `json:"args"`
 }
 
-// mpv <filename> --input-ipc-server <socket filepath>
+// mpv <filename> --input-ipc-server <socket filepath> --script= <script filepath>
 
-func trackViewTime(socketPath string) (float64, error) {
+func TrackViewTime(socketPath string) (float64, error) {
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
 		log.Fatalf("Unable to connect to socket: %v", err)
@@ -34,7 +34,7 @@ func trackViewTime(socketPath string) (float64, error) {
 			}
 			continue
 		}
-		mpvEvent := MpvEvent{}
+		mpvEvent := mpvEvent{}
 		err = json.Unmarshal(buf[:n], &mpvEvent)
 		if err != nil {
 			log.Printf("Error unmarshalling event: %v", err)

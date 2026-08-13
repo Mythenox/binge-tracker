@@ -12,22 +12,23 @@ import (
 const addSeason = `-- name: AddSeason :one
 INSERT INTO seasons(season_number, total_episodes, unwatched_episodes, finished, show_title)
 VALUES (
-    sql.arg(season_number),
     ?1,
-    ?1,
+    ?2,
+    ?2,
     FALSE,
-    ?2
+    ?3
 )
 RETURNING season_number, total_episodes, unwatched_episodes, finished, show_title
 `
 
 type AddSeasonParams struct {
+	SeasonNumber  int64
 	TotalEpisodes int64
 	ShowTitle     string
 }
 
 func (q *Queries) AddSeason(ctx context.Context, arg AddSeasonParams) (Season, error) {
-	row := q.db.QueryRowContext(ctx, addSeason, arg.TotalEpisodes, arg.ShowTitle)
+	row := q.db.QueryRowContext(ctx, addSeason, arg.SeasonNumber, arg.TotalEpisodes, arg.ShowTitle)
 	var i Season
 	err := row.Scan(
 		&i.SeasonNumber,
