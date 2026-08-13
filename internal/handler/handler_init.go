@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -21,13 +22,13 @@ import (
 // automatically adds all episodes found in given directory
 
 func HandlerInit(s *app.State, cmd app.Command) error {
-	// should accept inputs like "s01", "s1", or just "1"
-	// make sure to handle the case in which the thing already exists
 	if len(cmd.Args) != 3 {
 		return fmt.Errorf("Usage: %s <show title> <season number> <season directory path>", cmd.Name)
 	}
 
 	showTitle, seasonArg, seasonDirPath := cmd.Args[0], cmd.Args[1], cmd.Args[2]
+
+	seasonArg = CleanInput(seasonArg, "s")
 
 	seasonNumber, err := strconv.Atoi(seasonArg)
 	if err != nil {
@@ -36,6 +37,17 @@ func HandlerInit(s *app.State, cmd app.Command) error {
 
 	dirEntries, err := os.ReadDir(seasonDirPath)
 	if err != nil {
+		return err
+	}
+
+	// check if show already exists in database
+
+	_, err = s.DB.GetShow(context.Background(), showTitle)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			fmt.Printf("The show %s has already been initialized.\n", showTitle)
+			return nil
+		}
 		return err
 	}
 

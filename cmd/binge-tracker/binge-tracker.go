@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"log"
 	"os"
 
@@ -39,8 +40,8 @@ func main() {
 		log.Fatal("Usage: cli <command> [args...]")
 	}
 
-	cmdName := os.Args[1]
-	cmdArgs := os.Args[2:]
+	cmdName := flag.Args()[1]
+	cmdArgs := flag.Args()[2:]
 
 	err = cmds.Run(programState, app.Command{Name: cmdName, Args: cmdArgs})
 	if err != nil {

@@ -6,7 +6,9 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"strconv"
+	"time"
 )
 
 type mpvEvent struct {
@@ -17,6 +19,19 @@ type mpvEvent struct {
 // mpv <filename> --input-ipc-server <socket filepath> --script= <script filepath>
 
 func TrackViewTime(socketPath string) (float64, error) {
+	socketReady := false
+	for range 50 { // try for up to 5 seconds
+		if _, err := os.Stat(socketPath); err == nil {
+			socketReady = true
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	if !socketReady {
+		return 0.0, fmt.Errorf("timed out waiting for mpv socket at %s", socketPath)
+	}
+
 	conn, err := net.Dial("unix", socketPath)
 	if err != nil {
 		log.Fatalf("Unable to connect to socket: %v", err)
