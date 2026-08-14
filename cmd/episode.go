@@ -1,6 +1,5 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -9,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+// bingetracker delete episode Twin Peaks s02e01
 
 // episodeCmd represents the episode command
 var episodeCmd = &cobra.Command{

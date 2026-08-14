@@ -1,6 +1,5 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -9,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+// bingetracker move Twin Peaks s02 <new dirpath>
 
 // moveCmd represents the move command
 var moveCmd = &cobra.Command{

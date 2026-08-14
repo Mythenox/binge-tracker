@@ -1,6 +1,5 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -9,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+// bingetracker add season Twin Peaks s02 <dirpath>
 
 // seasonCmd represents the season command
 var seasonCmd = &cobra.Command{
