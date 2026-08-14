@@ -36,6 +36,9 @@ automatically adds all episodes found in given directory`,
 		if err != nil {
 			return err
 		}
+		if seasonNumber < 0 {
+			return errors.New("Season numbers must be non-negative")
+		}
 
 		seasonDirPath := cmd.Flags().Args()[2]
 

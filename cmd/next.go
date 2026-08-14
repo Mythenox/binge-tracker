@@ -4,14 +4,19 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 
+	"github.com/mythenox/binge-tracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 
 // nextCmd represents the next command
+// play next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]
 var nextCmd = &cobra.Command{
-	Use:   "next",
+	Use:   "next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -20,14 +25,42 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("next called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dashIndex := cmd.ArgsLenAtDash()
+		if dashIndex == -1 {
+			dashIndex = len(args)
+		}
+
+		if dashIndex > 2 {
+			return fmt.Errorf("accepts at most 2 args before '--', received %d", dashIndex)
+		}
+
+		cmdArgs := args[:dashIndex]
+		playerArgs := args[dashIndex:]
+
+		showTitle := cmdArgs[0]
+		playNextArgs := handler.PlayNextArgs{ShowTitle: showTitle, VideoPlayer: s.Cfg.VideoPlayer}
+
+		if dashIndex == 2 {
+			episodeRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
+			seasonIdentifier := cmdArgs[1]
+			matches := episodeRegex.FindStringSubmatch(seasonIdentifier)
+			if len(matches) != 2 {
+				return errors.New("Invalid format")
+			}
+			seasonNumber, err := strconv.Atoi(matches[1])
+			if err != nil {
+				return err
+			}
+			playNextArgs.SeasonNumber = seasonNumber
+		} else {
+			playNextArgs.SeasonNumber = -1 // sentinel value
+		}
+
+		return handler.HandlerPlayNext(cmd.Context(), s, playNextArgs,
+			s.Cfg.SkipInProgress, playerArgs)
 	},
 }
-
-// ex: bingetracker play next <show title> [optional: season]
-// flag: --skip-partially-watched
-// maybe this should be a config option instead?
 
 func init() {
 	playCmd.AddCommand(nextCmd)

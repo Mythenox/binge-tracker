@@ -20,9 +20,11 @@ type State struct {
 }
 
 type Config struct {
-	DBPath     string `json:"db_path"`
-	SocketPath string `json:"socket_path"`
-	ScriptPath string `json:"script_path"`
+	DBPath         string `json:"db_path"`
+	SocketPath     string `json:"socket_path"`
+	ScriptPath     string `json:"script_path"`
+	SkipInProgress bool   `json:"skip_in_progress"`
+	VideoPlayer    string `json:"video_player"`
 }
 
 func (s *State) LoadConfig() error {

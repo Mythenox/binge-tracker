@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// episodeCmd represents the episode command
-var episodeCmd = &cobra.Command{
-	Use:   "episode",
+// moveCmd represents the move command
+var moveCmd = &cobra.Command{
+	Use:   "move",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -21,20 +21,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("episode called")
+		fmt.Println("move called")
 	},
 }
 
 func init() {
-	deleteCmd.AddCommand(episodeCmd)
+	rootCmd.AddCommand(moveCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// episodeCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// moveCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// episodeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// moveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

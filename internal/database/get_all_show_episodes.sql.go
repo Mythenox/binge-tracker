@@ -12,6 +12,7 @@ import (
 const getAllShowEpisodes = `-- name: GetAllShowEpisodes :many
 SELECT episode_number, filepath, viewtime, runtime, watched, show_title, season_number FROM episodes
 WHERE show_title = ?1
+ORDER BY season_number ASC, episode_number ASC
 `
 
 func (q *Queries) GetAllShowEpisodes(ctx context.Context, showTitle string) ([]Episode, error) {

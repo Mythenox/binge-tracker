@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 
@@ -14,7 +15,7 @@ import (
 
 // playCmd represents the play command
 var playCmd = &cobra.Command{
-	Use:   "play (mpv | vlc) <show name> <sXXeYY> [-- player_flags]",
+	Use:   "play <show name> <sXXeYY> [-- player_flags]",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -22,20 +23,30 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(3),
+	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cmd.Println("play called")
+		dashIndex := cmd.ArgsLenAtDash()
+		if dashIndex == -1 {
+			dashIndex = len(args)
+		}
+
+		if dashIndex != 2 {
+			return fmt.Errorf("accepts exactly 2 args before '--', received %d", dashIndex)
+		}
+
+		cmdArgs := args[:dashIndex]
+		playerArgs := args[dashIndex:]
+
 		episodeRegex := regexp.MustCompile(`(?i)^s(\d+)e(\d+)$`)
 
-		btArgs := cmd.Flags().Args()
-
-		episodeIdentifier := btArgs[2]
+		episodeIdentifier := cmdArgs[1]
 		matches := episodeRegex.FindStringSubmatch(episodeIdentifier)
 		if len(matches) != 3 {
 			return errors.New("Invalid format")
 		}
 
-		videoPlayer := btArgs[0]
-		showTitle := btArgs[1]
+		showTitle := cmdArgs[0]
 		seasonNumber, err := strconv.Atoi(matches[1])
 		if err != nil {
 			return err
@@ -46,9 +57,8 @@ to quickly create a Cobra application.`,
 		}
 
 		restart, _ := cmd.Flags().GetBool("restart")
-		playerArgs := cmd.Flags().Args()[cmd.Flags().NArg():]
 
-		switch videoPlayer {
+		switch s.Cfg.VideoPlayer {
 		case "mpv":
 			return handler.HandlerPlayMPV(
 				cmd.Context(),
