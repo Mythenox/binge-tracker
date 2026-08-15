@@ -1,4 +1,4 @@
--- name: GetNextUnwatchedSeasonEpisode :one
+-- name: GetNextUnwatchedEpisodeFromSeason :one
 SELECT *
 FROM episodes
 WHERE 

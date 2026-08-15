@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const getAllSeasonEpisodes = `-- name: GetAllSeasonEpisodes :many
+const getAllEpisodesFromSeason = `-- name: GetAllEpisodesFromSeason :many
 SELECT episode_number, filepath, viewtime, runtime, watched, show_title, season_number FROM episodes
 WHERE
     show_title = ?1 AND
@@ -17,13 +17,13 @@ WHERE
 ORDER BY episode_number ASC
 `
 
-type GetAllSeasonEpisodesParams struct {
+type GetAllEpisodesFromSeasonParams struct {
 	ShowTitle    string
 	SeasonNumber int64
 }
 
-func (q *Queries) GetAllSeasonEpisodes(ctx context.Context, arg GetAllSeasonEpisodesParams) ([]Episode, error) {
-	rows, err := q.db.QueryContext(ctx, getAllSeasonEpisodes, arg.ShowTitle, arg.SeasonNumber)
+func (q *Queries) GetAllEpisodesFromSeason(ctx context.Context, arg GetAllEpisodesFromSeasonParams) ([]Episode, error) {
+	rows, err := q.db.QueryContext(ctx, getAllEpisodesFromSeason, arg.ShowTitle, arg.SeasonNumber)
 	if err != nil {
 		return nil, err
 	}

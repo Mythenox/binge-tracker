@@ -38,25 +38,17 @@ to quickly create a Cobra application.`,
 		cmdArgs := args[:dashIndex]
 		playerArgs := args[dashIndex:]
 
-		episodeRegex := regexp.MustCompile(`(?i)^s(\d+)e(\d+)$`)
-
-		episodeIdentifier := cmdArgs[1]
-		matches := episodeRegex.FindStringSubmatch(episodeIdentifier)
-		if len(matches) != 3 {
-			return errors.New("Invalid format")
-		}
+		restart, _ := cmd.Flags().GetBool("restart")
 
 		showTitle := cmdArgs[0]
-		seasonNumber, err := strconv.Atoi(matches[1])
-		if err != nil {
-			return err
-		}
-		episodeNumber, err := strconv.Atoi(matches[2])
+		episodeIdentifier := cmdArgs[1]
+
+		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
 		if err != nil {
 			return err
 		}
 
-		restart, _ := cmd.Flags().GetBool("restart")
+		seasonNumber, episodeNumber := nums[0], nums[1]
 
 		switch s.Cfg.VideoPlayer {
 		case "mpv":
@@ -75,6 +67,46 @@ to quickly create a Cobra application.`,
 			return errors.New("unsupported player")
 		}
 	},
+}
+
+// returns {XX, YY} from input sXXeYY.
+func extractFromEpisodeIdentifier(episodeIdentifier string) ([]int, error) {
+	episodeRegex := regexp.MustCompile(`(?i)^s(\d+)e(\d+)$`)
+
+	matches := episodeRegex.FindStringSubmatch(episodeIdentifier)
+	if len(matches) != 3 {
+		return nil, errors.New("Invalid format")
+	}
+
+	seasonNumber, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return nil, err
+	}
+	episodeNumber, err := strconv.Atoi(matches[2])
+	if err != nil {
+		return nil, err
+	}
+
+	nums := []int{seasonNumber, episodeNumber}
+
+	return nums, nil
+}
+
+// returns XX from input sXX.
+func extractFromSeasonIdentifier(seasonIdentifier string) (int, error) {
+	seasonRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
+
+	matches := seasonRegex.FindStringSubmatch(seasonIdentifier)
+	if len(matches) != 3 {
+		return 0, errors.New("Invalid format")
+	}
+
+	seasonNumber, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return 0, err
+	}
+
+	return seasonNumber, nil
 }
 
 func init() {

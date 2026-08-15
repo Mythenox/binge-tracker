@@ -15,16 +15,17 @@ import (
 const configFileName = ".btconfig.json"
 
 type State struct {
-	DB  *database.Queries
+	DB  *sql.DB
+	Q   *database.Queries
 	Cfg *Config
 }
 
 type Config struct {
-	DBPath         string `json:"db_path"`
-	SocketPath     string `json:"socket_path"`
-	ScriptPath     string `json:"script_path"`
-	SkipInProgress bool   `json:"skip_in_progress"`
-	VideoPlayer    string `json:"video_player"`
+	DBPath               string `json:"db_path"`
+	SocketPath           string `json:"socket_path"`
+	ScriptPath           string `json:"script_path"`
+	CountPartialProgress bool   `json:"count_partial_progress"`
+	VideoPlayer          string `json:"video_player"`
 }
 
 func (s *State) LoadConfig() error {
@@ -61,7 +62,10 @@ func (s *State) ConnectDB() error {
 	if err != nil {
 		return err
 	}
-	s.DB = database.New(db)
+
+	s.DB = db
+	s.Q = database.New(db)
+
 	return nil
 }
 

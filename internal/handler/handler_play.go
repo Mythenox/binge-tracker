@@ -18,134 +18,73 @@ import (
 
 // RunE func(cmd *Command, args []string) error
 
-type SeasonWatchedError struct{}
+type SeasonWatchedErr struct{}
 
-func (*SeasonWatchedError) Error() string {
+func (*SeasonWatchedErr) Error() string {
 	return "All episodes of this season have been watched."
 }
 
-type ShowWatchedError struct{}
+type ShowWatchedErr struct{}
 
-func (*ShowWatchedError) Error() string {
+func (*ShowWatchedErr) Error() string {
 	return "All episodes of this show have been watched."
-}
-
-type PlayNextArgs struct {
-	VideoPlayer  string
-	ShowTitle    string
-	SeasonNumber int
 }
 
 func HandlerPlayNext(
 	cmdContext context.Context,
 	s *app.State,
-	btArgs PlayNextArgs,
-	skipInProgress bool,
+	showTitle string,
+	seasonNumber int,
+	verboseInput bool,
 	playerArgs []string,
 ) error {
 	// bingetracker play next Twin Peaks OR bingetracker play next Twin Peaks sXX
-
-	// skip_in_progress = false:
-	// find first unfinished season -> currentSeason := GetUnfinishedSeasons[0]
-	// find first unwatched episode in season -> GetUnwatchedSeasonEpisodes(currentSeason)[0]
-	// any of the above don't exist -> error
-	// else -> done
-
-	if !skipInProgress {
-		unfinishedSeasons, err := s.DB.GetUnfinishedSeasons(cmdContext, btArgs.ShowTitle)
-		if err != nil {
-			return err
+	nextUnfinishedSeason, err := s.Q.GetNextUnfinishedSeason(cmdContext, showTitle)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return new(ShowWatchedErr)
 		}
+		return err
+	}
 
-		// len == 0 means all seasons have been watched, i.e. the show has been fully watched.
-		if len(unfinishedSeasons) == 0 {
-			return new(ShowWatchedError)
-		}
+	// lowest season number with unwatched episodes
+	currentSeasonNumber := nextUnfinishedSeason.SeasonNumber
 
-		currentSeasonNumber := unfinishedSeasons[0].SeasonNumber
-
-		if btArgs.SeasonNumber != -1 && int64(btArgs.SeasonNumber) < currentSeasonNumber {
-			return new(SeasonWatchedError)
-		} else if int64(btArgs.SeasonNumber) > currentSeasonNumber {
+	// if the user provided a season number, make sure that it doesn't point to a finished season
+	// or use it if it's ahead of the currentSeasonNumber
+	if verboseInput {
+		if int64(seasonNumber) < currentSeasonNumber {
+			return new(SeasonWatchedErr)
+		} else if int64(seasonNumber) > currentSeasonNumber {
 			// in this case, this means the user is watching a more recent season before finishing the older one(s)
 			// this is fine, so just set the current season number to the user's input
-			currentSeasonNumber = int64(btArgs.SeasonNumber)
+			currentSeasonNumber = int64(seasonNumber)
 		}
+	}
 
-		// at this point in the program, there must exist an unwatched episode in this season
-		// otherwise it would have returned with a ShowWatchedError already.
-		nextEpisode, err := s.DB.GetNextUnwatchedSeasonEpisode(cmdContext, database.GetNextUnwatchedSeasonEpisodeParams{
-			SeasonNumber: currentSeasonNumber,
-			ShowTitle:    btArgs.ShowTitle,
-		})
-		if err != nil {
-			return err
-		}
+	// at this point in the program, there must exist an unwatched episode in this season
+	// otherwise it would have returned with a ShowWatchedErr already.
+	nextEpisode, err := s.Q.GetNextUnwatchedEpisodeFromSeason(cmdContext, database.GetNextUnwatchedEpisodeFromSeasonParams{
+		SeasonNumber: currentSeasonNumber,
+		ShowTitle:    showTitle,
+	})
+	if err != nil {
+		return err
+	}
 
-		if btArgs.VideoPlayer == "mpv" {
-			return HandlerPlayMPV(
-				cmdContext,
-				s,
-				btArgs.ShowTitle,
-				int(currentSeasonNumber),
-				int(nextEpisode.EpisodeNumber),
-				false,
-				playerArgs,
-			)
-		} else {
-			// insert HandlerPlayVLC here
-			return nil
-		}
+	if s.Cfg.VideoPlayer == "mpv" {
+		return HandlerPlayMPV(
+			cmdContext,
+			s,
+			showTitle,
+			int(currentSeasonNumber),
+			int(nextEpisode.EpisodeNumber),
+			false,
+			playerArgs,
+		)
 	} else {
-		// skip_in_progress = true:
-		// find season with least viewtime -> GetLeastViewedSeason[0] (ORDER BY total_viewtime ASC, season_number ASC)
-		// find episode with 0 viewtime -> GetNoProgressSeasonEpisodes[0] (ORDER BY viewtime ASC, episode_number ASC)
-		// episode with 0 viewtime doesn't exist -> error
-		// else -> done
-
-		leastViewedSeason, err := s.DB.GetLeastViewedSeason(cmdContext, btArgs.ShowTitle)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return new(ShowWatchedError)
-			}
-			return err
-		}
-
-		currentSeasonNumber := leastViewedSeason.SeasonNumber
-
-		if btArgs.SeasonNumber != -1 && int64(btArgs.SeasonNumber) < currentSeasonNumber {
-			return new(SeasonWatchedError)
-		} else if int64(btArgs.SeasonNumber) > currentSeasonNumber {
-			// in this case, this means the user is watching a more recent season before finishing the older one(s)
-			// this is fine, so just set the current season number to the user's input
-			currentSeasonNumber = int64(btArgs.SeasonNumber)
-		}
-
-		nextEpisode, err := s.DB.GetNextNoProgressSeasonEpisode(cmdContext, database.GetNextNoProgressSeasonEpisodeParams{
-			ShowTitle:    btArgs.ShowTitle,
-			SeasonNumber: currentSeasonNumber,
-		})
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return new(SeasonWatchedError)
-			}
-			return err
-		}
-
-		if btArgs.VideoPlayer == "mpv" {
-			return HandlerPlayMPV(
-				cmdContext,
-				s,
-				btArgs.ShowTitle,
-				int(currentSeasonNumber),
-				int(nextEpisode.EpisodeNumber),
-				false,
-				playerArgs,
-			)
-		} else {
-			// insert HandlerPlayVLC here
-			return nil
-		}
+		// insert HandlerPlayVLC here
+		return nil
 	}
 }
 
@@ -157,13 +96,20 @@ func HandlerPlayMPV(
 	restart bool,
 	playerArgs []string) error {
 
-	episode, err := s.DB.GetEpisode(cmdContext, database.GetEpisodeParams{
+	episode, err := s.Q.GetEpisode(cmdContext, database.GetEpisodeParams{
 		ShowTitle:     showTitle,
 		SeasonNumber:  int64(seasonNumber),
 		EpisodeNumber: int64(episodeNumber),
 	})
 	if err != nil {
 		return err
+	}
+
+	// if the episode was previously fully watched, the user choosing to play it again
+	// most likely wants to watch it again from the beginning
+
+	if int(episode.Viewtime) == int(episode.Runtime) {
+		restart = true
 	}
 
 	mpvFlags := []string{
@@ -202,28 +148,14 @@ func HandlerPlayMPV(
 		log.Println("Process exited gracefully on its own.")
 	}()
 
-	viewTime, err := listen.TrackViewTime(s.Cfg.SocketPath)
+	viewtime, err := listen.TrackViewTime(s.Cfg.SocketPath)
 	if err != nil {
 		return err
 	}
 
-	watched := (viewTime/episode.Runtime >= 0.85)
-
-	_, err = s.DB.UpdateEpisodeStats(cmdContext, database.UpdateEpisodeStatsParams{
-		Viewtime:      viewTime,
-		Watched:       watched,
-		ShowTitle:     episode.ShowTitle,
-		SeasonNumber:  episode.SeasonNumber,
-		EpisodeNumber: episode.EpisodeNumber,
-	})
+	err = updateDB(cmdContext, s, viewtime, episode)
 	if err != nil {
 		return err
-	}
-
-	if watched {
-		fmt.Printf("You finished watching s%de%d of %s.\n", seasonNumber, episodeNumber, showTitle)
-	} else {
-		fmt.Printf("You did not finish watching s%de%d of %s.\n", seasonNumber, episodeNumber, showTitle)
 	}
 
 	return nil
@@ -237,4 +169,35 @@ func handlerPlayVLC(
 	restart bool,
 	playerArgs []string,
 ) {
+}
+
+func updateDB(cmdContext context.Context, s *app.State,
+	viewtime float64, episode database.Episode) error {
+	var watched bool
+	if s.Cfg.CountPartialProgress {
+		watched = viewtime >= 0.0
+	} else {
+		watched = (viewtime/episode.Runtime >= 0.85)
+	}
+
+	_, err := s.Q.UpdateEpisodeStats(cmdContext, database.UpdateEpisodeStatsParams{
+		Viewtime:      viewtime,
+		Watched:       watched,
+		ShowTitle:     episode.ShowTitle,
+		SeasonNumber:  episode.SeasonNumber,
+		EpisodeNumber: episode.EpisodeNumber,
+	})
+	if err != nil {
+		return err
+	}
+
+	if watched {
+		fmt.Printf("You finished watching s%de%d of %s.\n",
+			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
+	} else {
+		fmt.Printf("You did not finish watching s%de%d of %s.\n",
+			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
+	}
+
+	return nil
 }

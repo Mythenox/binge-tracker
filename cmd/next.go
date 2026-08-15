@@ -39,26 +39,29 @@ to quickly create a Cobra application.`,
 		playerArgs := args[dashIndex:]
 
 		showTitle := cmdArgs[0]
-		playNextArgs := handler.PlayNextArgs{ShowTitle: showTitle, VideoPlayer: s.Cfg.VideoPlayer}
+		verboseInput := dashIndex == 2
+		var seasonNumber int
+		// seasonNumber is ignored by handler if verboseInput == false
 
-		if dashIndex == 2 {
+		if verboseInput {
 			episodeRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
+
 			seasonIdentifier := cmdArgs[1]
+
 			matches := episodeRegex.FindStringSubmatch(seasonIdentifier)
 			if len(matches) != 2 {
 				return errors.New("Invalid format")
 			}
-			seasonNumber, err := strconv.Atoi(matches[1])
+
+			var err error
+			seasonNumber, err = strconv.Atoi(matches[1])
 			if err != nil {
 				return err
 			}
-			playNextArgs.SeasonNumber = seasonNumber
-		} else {
-			playNextArgs.SeasonNumber = -1 // sentinel value
 		}
 
-		return handler.HandlerPlayNext(cmd.Context(), s, playNextArgs,
-			s.Cfg.SkipInProgress, playerArgs)
+		return handler.HandlerPlayNext(cmd.Context(), s, showTitle, seasonNumber,
+			verboseInput, playerArgs)
 	},
 }
 

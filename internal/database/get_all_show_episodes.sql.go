@@ -9,14 +9,14 @@ import (
 	"context"
 )
 
-const getAllShowEpisodes = `-- name: GetAllShowEpisodes :many
+const getAllEpisodesFromShow = `-- name: GetAllEpisodesFromShow :many
 SELECT episode_number, filepath, viewtime, runtime, watched, show_title, season_number FROM episodes
 WHERE show_title = ?1
 ORDER BY season_number ASC, episode_number ASC
 `
 
-func (q *Queries) GetAllShowEpisodes(ctx context.Context, showTitle string) ([]Episode, error) {
-	rows, err := q.db.QueryContext(ctx, getAllShowEpisodes, showTitle)
+func (q *Queries) GetAllEpisodesFromShow(ctx context.Context, showTitle string) ([]Episode, error) {
+	rows, err := q.db.QueryContext(ctx, getAllEpisodesFromShow, showTitle)
 	if err != nil {
 		return nil, err
 	}

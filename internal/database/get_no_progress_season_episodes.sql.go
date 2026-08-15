@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const getNoProgressSeasonEpisodes = `-- name: GetNoProgressSeasonEpisodes :many
+const getNoProgressEpisodesFromSeason = `-- name: GetNoProgressEpisodesFromSeason :many
 SELECT episode_number, filepath, viewtime, runtime, watched, show_title, season_number FROM episodes
 WHERE
     show_title = ?1 AND
@@ -18,13 +18,13 @@ WHERE
 ORDER BY episode_number ASC
 `
 
-type GetNoProgressSeasonEpisodesParams struct {
+type GetNoProgressEpisodesFromSeasonParams struct {
 	ShowTitle    string
 	SeasonNumber int64
 }
 
-func (q *Queries) GetNoProgressSeasonEpisodes(ctx context.Context, arg GetNoProgressSeasonEpisodesParams) ([]Episode, error) {
-	rows, err := q.db.QueryContext(ctx, getNoProgressSeasonEpisodes, arg.ShowTitle, arg.SeasonNumber)
+func (q *Queries) GetNoProgressEpisodesFromSeason(ctx context.Context, arg GetNoProgressEpisodesFromSeasonParams) ([]Episode, error) {
+	rows, err := q.db.QueryContext(ctx, getNoProgressEpisodesFromSeason, arg.ShowTitle, arg.SeasonNumber)
 	if err != nil {
 		return nil, err
 	}

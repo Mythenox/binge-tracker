@@ -1,4 +1,4 @@
--- name: ResetEpisodeViewtime :exec
+-- name: ResetEpisodeStats :exec
 UPDATE episodes
 SET viewtime = 0.0,
     watched = FALSE

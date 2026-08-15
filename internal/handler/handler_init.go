@@ -39,7 +39,7 @@ func HandlerInit(c context.Context,
 
 	// check if show already exists in database
 
-	_, err = s.DB.GetShow(context.Background(), showTitle)
+	_, err = s.Q.GetShow(context.Background(), showTitle)
 	if err == nil {
 		return new(ShowExistsError)
 	}
@@ -85,7 +85,7 @@ func HandlerInit(c context.Context,
 		return errors.New("No valid files found in given directory")
 	}
 
-	_, err = s.DB.AddShow(context.Background(), database.AddShowParams{
+	_, err = s.Q.AddShow(context.Background(), database.AddShowParams{
 		Title:         showTitle,
 		Seasons:       1,
 		TotalEpisodes: int64(episodeCount - 1),
@@ -94,7 +94,7 @@ func HandlerInit(c context.Context,
 		return fmt.Errorf("error adding show to database: %w", err)
 	}
 
-	season, err := s.DB.AddSeason(context.Background(), database.AddSeasonParams{
+	season, err := s.Q.AddSeason(context.Background(), database.AddSeasonParams{
 		SeasonNumber:  int64(seasonNumber),
 		TotalEpisodes: int64(episodeCount - 1),
 		ShowTitle:     showTitle,
@@ -104,7 +104,7 @@ func HandlerInit(c context.Context,
 	}
 
 	for _, episode := range episodes {
-		_, err := s.DB.AddEpisode(context.Background(), episode)
+		_, err := s.Q.AddEpisode(context.Background(), episode)
 		if err != nil {
 			return fmt.Errorf("error adding episode to database: %w", err)
 		}

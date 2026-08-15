@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const getLeastViewedSeason = `-- name: GetLeastViewedSeason :one
+const getLeastViewedSeasonFromShow = `-- name: GetLeastViewedSeasonFromShow :one
 WITH ViewtimeTotals AS (
     SELECT show_title, season_number, SUM(viewtime) AS total_viewtime
     FROM episodes
@@ -25,8 +25,8 @@ ORDER BY season_number ASC
 LIMIT 1
 `
 
-func (q *Queries) GetLeastViewedSeason(ctx context.Context, showTitle string) (Season, error) {
-	row := q.db.QueryRowContext(ctx, getLeastViewedSeason, showTitle)
+func (q *Queries) GetLeastViewedSeasonFromShow(ctx context.Context, showTitle string) (Season, error) {
+	row := q.db.QueryRowContext(ctx, getLeastViewedSeasonFromShow, showTitle)
 	var i Season
 	err := row.Scan(
 		&i.SeasonNumber,

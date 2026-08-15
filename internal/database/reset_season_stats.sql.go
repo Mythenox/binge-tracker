@@ -9,11 +9,30 @@ import (
 	"context"
 )
 
-const resetSeasonStats = `-- name: ResetSeasonStats :exec
+const resetEpisodeStatsForSeason = `-- name: ResetEpisodeStatsForSeason :exec
 UPDATE episodes
 SET viewtime = 0.0,
     watched = FALSE
 WHERE 
+    show_title = ?1 AND
+    season_number = ?2
+`
+
+type ResetEpisodeStatsForSeasonParams struct {
+	ShowTitle    string
+	SeasonNumber int64
+}
+
+func (q *Queries) ResetEpisodeStatsForSeason(ctx context.Context, arg ResetEpisodeStatsForSeasonParams) error {
+	_, err := q.db.ExecContext(ctx, resetEpisodeStatsForSeason, arg.ShowTitle, arg.SeasonNumber)
+	return err
+}
+
+const resetSeasonStats = `-- name: ResetSeasonStats :exec
+UPDATE seasons
+SET finished = FALSE,
+    unwatched_episodes = total_episodes
+WHERE
     show_title = ?1 AND
     season_number = ?2
 `

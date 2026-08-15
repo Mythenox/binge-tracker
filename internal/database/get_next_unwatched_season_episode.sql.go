@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const getNextUnwatchedSeasonEpisode = `-- name: GetNextUnwatchedSeasonEpisode :one
+const getNextUnwatchedEpisodeFromSeason = `-- name: GetNextUnwatchedEpisodeFromSeason :one
 SELECT episode_number, filepath, viewtime, runtime, watched, show_title, season_number
 FROM episodes
 WHERE 
@@ -20,13 +20,13 @@ ORDER BY episode_number ASC
 LIMIT 1
 `
 
-type GetNextUnwatchedSeasonEpisodeParams struct {
+type GetNextUnwatchedEpisodeFromSeasonParams struct {
 	SeasonNumber int64
 	ShowTitle    string
 }
 
-func (q *Queries) GetNextUnwatchedSeasonEpisode(ctx context.Context, arg GetNextUnwatchedSeasonEpisodeParams) (Episode, error) {
-	row := q.db.QueryRowContext(ctx, getNextUnwatchedSeasonEpisode, arg.SeasonNumber, arg.ShowTitle)
+func (q *Queries) GetNextUnwatchedEpisodeFromSeason(ctx context.Context, arg GetNextUnwatchedEpisodeFromSeasonParams) (Episode, error) {
+	row := q.db.QueryRowContext(ctx, getNextUnwatchedEpisodeFromSeason, arg.SeasonNumber, arg.ShowTitle)
 	var i Episode
 	err := row.Scan(
 		&i.EpisodeNumber,

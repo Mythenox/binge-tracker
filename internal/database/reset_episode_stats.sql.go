@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const resetEpisodeViewtime = `-- name: ResetEpisodeViewtime :exec
+const resetEpisodeStats = `-- name: ResetEpisodeStats :exec
 UPDATE episodes
 SET viewtime = 0.0,
     watched = FALSE
@@ -19,13 +19,13 @@ WHERE
     episode_number = ?3
 `
 
-type ResetEpisodeViewtimeParams struct {
+type ResetEpisodeStatsParams struct {
 	ShowTitle     string
 	SeasonNumber  int64
 	EpisodeNumber int64
 }
 
-func (q *Queries) ResetEpisodeViewtime(ctx context.Context, arg ResetEpisodeViewtimeParams) error {
-	_, err := q.db.ExecContext(ctx, resetEpisodeViewtime, arg.ShowTitle, arg.SeasonNumber, arg.EpisodeNumber)
+func (q *Queries) ResetEpisodeStats(ctx context.Context, arg ResetEpisodeStatsParams) error {
+	_, err := q.db.ExecContext(ctx, resetEpisodeStats, arg.ShowTitle, arg.SeasonNumber, arg.EpisodeNumber)
 	return err
 }

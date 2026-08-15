@@ -1,4 +1,4 @@
--- name: GetLeastViewedSeason :one
+-- name: GetLeastViewedSeasonFromShow :one
 WITH ViewtimeTotals AS (
     SELECT show_title, season_number, SUM(viewtime) AS total_viewtime
     FROM episodes
