@@ -5,7 +5,7 @@ WHERE
     show_title = sqlc.arg(show_title) AND
     season_number = sqlc.arg(season_number);
 
--- name: SetSeasonEpisodesWatched :exec
+-- name: SetEpisodesForSeasonWatched :exec
 
 UPDATE episodes
 SET

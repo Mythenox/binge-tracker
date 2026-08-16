@@ -1,11 +1,10 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -20,8 +19,12 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("unwatched called")
+	Args: cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		inputIsRange := strings.Contains(args[1], "-")
+		episodeMode := strings.Contains(args[1], "e")
+
+		return setCompletion(cmd, args, s, inputIsRange, episodeMode, false)
 	},
 }
 

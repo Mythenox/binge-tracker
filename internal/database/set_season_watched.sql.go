@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const setSeasonEpisodesWatched = `-- name: SetSeasonEpisodesWatched :exec
+const setEpisodesForSeasonWatched = `-- name: SetEpisodesForSeasonWatched :exec
 
 UPDATE episodes
 SET
@@ -20,13 +20,13 @@ WHERE
     season_number = ?2
 `
 
-type SetSeasonEpisodesWatchedParams struct {
+type SetEpisodesForSeasonWatchedParams struct {
 	ShowTitle    string
 	SeasonNumber int64
 }
 
-func (q *Queries) SetSeasonEpisodesWatched(ctx context.Context, arg SetSeasonEpisodesWatchedParams) error {
-	_, err := q.db.ExecContext(ctx, setSeasonEpisodesWatched, arg.ShowTitle, arg.SeasonNumber)
+func (q *Queries) SetEpisodesForSeasonWatched(ctx context.Context, arg SetEpisodesForSeasonWatchedParams) error {
+	_, err := q.db.ExecContext(ctx, setEpisodesForSeasonWatched, arg.ShowTitle, arg.SeasonNumber)
 	return err
 }
 

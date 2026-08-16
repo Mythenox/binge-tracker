@@ -97,7 +97,7 @@ func extractFromSeasonIdentifier(seasonIdentifier string) (int, error) {
 	seasonRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
 
 	matches := seasonRegex.FindStringSubmatch(seasonIdentifier)
-	if len(matches) != 3 {
+	if len(matches) != 2 {
 		return 0, errors.New("Invalid format")
 	}
 
