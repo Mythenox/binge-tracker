@@ -16,7 +16,7 @@ import (
 // bingetracker set watched Twin Peaks s01e01-s01e06
 
 // watchedCmd represents the watched command
-var watchedCmd = &cobra.Command{
+var setWatchedCmd = &cobra.Command{
 	Use:   "watched",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -32,6 +32,20 @@ to quickly create a Cobra application.`,
 
 		return setCompletion(cmd, args, s, inputIsRange, episodeMode, true)
 	},
+}
+
+func init() {
+	setCmd.AddCommand(setWatchedCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// watchedCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// watchedCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func setCompletion(cmd *cobra.Command, args []string, s *app.State,
@@ -98,18 +112,4 @@ func setCompletion(cmd *cobra.Command, args []string, s *app.State,
 				seasonNumber, setWatched)
 		}
 	}
-}
-
-func init() {
-	setCmd.AddCommand(watchedCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// watchedCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// watchedCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -96,16 +96,16 @@ func HandlerSetEpisodeRangeCompletion(cmdContext context.Context, s *app.State, 
 		}
 		// just set full season as finished/unfinished until i == endSeasonNumber
 		for i := startSeasonNumber; i < endSeasonNumber; i++ {
+			err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
+			if err != nil {
+				return err
+			}
 
 			err = setSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
 			if err != nil {
 				return err
 			}
 
-			err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
-			if err != nil {
-				return err
-			}
 		}
 
 		for i := 1; i <= endEpisodeNumber; i++ {
@@ -222,12 +222,12 @@ func HandlerSetSeasonRangeCompletion(cmdContext context.Context, s *app.State, s
 	qtx := s.Q.WithTx(tx)
 
 	for i := startSeasonNumber; i <= endSeasonNumber; i++ {
-		err = setSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
+		err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
 		if err != nil {
 			return err
 		}
 
-		err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
+		err = setSeasonCompletion(qtx, cmdContext, showTitle, int64(i))
 		if err != nil {
 			return err
 		}
@@ -291,12 +291,12 @@ func HandlerSetSeasonCompletion(cmdContext context.Context, s *app.State, showTi
 
 	qtx := s.Q.WithTx(tx)
 
-	err = setSeasonCompletion(qtx, cmdContext, showTitle, int64(seasonNumber))
+	err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(seasonNumber))
 	if err != nil {
 		return err
 	}
 
-	err = setEpisodesForSeasonCompletion(qtx, cmdContext, showTitle, int64(seasonNumber))
+	err = setSeasonCompletion(qtx, cmdContext, showTitle, int64(seasonNumber))
 	if err != nil {
 		return err
 	}

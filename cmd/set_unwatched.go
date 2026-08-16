@@ -4,16 +4,14 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-// bingetracker delete episode Twin Peaks s02e01
-
-// episodeCmd represents the episode command
-var episodeCmd = &cobra.Command{
-	Use:   "episode",
+// unwatchedCmd represents the unwatched command
+var setUnwatchedCmd = &cobra.Command{
+	Use:   "unwatched",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -21,21 +19,25 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("episode called")
+	Args: cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		inputIsRange := strings.Contains(args[1], "-")
+		episodeMode := strings.Contains(args[1], "e")
+
+		return setCompletion(cmd, args, s, inputIsRange, episodeMode, false)
 	},
 }
 
 func init() {
-	deleteCmd.AddCommand(episodeCmd)
+	setCmd.AddCommand(setUnwatchedCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// episodeCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// unwatchedCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// episodeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// unwatchedCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -9,11 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// bingetracker add season Twin Peaks s02 <dirpath>
-
-// seasonCmd represents the season command
-var seasonCmd = &cobra.Command{
-	Use:   "season",
+// showCmd represents the show command
+var removeShowCmd = &cobra.Command{
+	Use:   "show",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -22,20 +20,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("season called")
+		fmt.Println("show called")
 	},
 }
 
 func init() {
-	deleteCmd.AddCommand(seasonCmd)
+	removeCmd.AddCommand(removeShowCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// seasonCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// showCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// seasonCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

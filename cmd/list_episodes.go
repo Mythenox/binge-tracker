@@ -8,9 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// showsCmd represents the shows command
-var showsCmd = &cobra.Command{
-	Use:   "shows",
+// bingetracker list seasons Twin Peaks
+
+// episodesCmd represents the episodes command
+var episodesCmd = &cobra.Command{
+	Use:   "episodes <show title> <season number>",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -18,22 +20,35 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Args: cobra.NoArgs,
+	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return handler.HandlerListShows(cmd.Context(), s)
+		showTitle := args[0]
+		seasonIdentifier := args[1]
+
+		seasonNumber, err := extractFromSeasonIdentifier(seasonIdentifier)
+		if err != nil {
+			return err
+		}
+
+		return handler.HandlerListEpisodes(
+			cmd.Context(),
+			s,
+			showTitle,
+			seasonNumber,
+		)
 	},
 }
 
 func init() {
-	listCmd.AddCommand(showsCmd)
+	listCmd.AddCommand(episodesCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// showsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// episodesCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// showsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// episodesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
