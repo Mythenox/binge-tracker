@@ -4,8 +4,7 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/mythenox/binge-tracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 
@@ -21,8 +20,19 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("remove episode called")
+	Args: cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		showTitle := args[0]
+		episodeIdentifier := args[1]
+
+		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
+		if err != nil {
+			return err
+		}
+
+		seasonNumber, episodeNumber := nums[0], nums[1]
+
+		return handler.HandlerRemoveEpisode(cmd.Context(), s, showTitle, seasonNumber, episodeNumber)
 	},
 }
 

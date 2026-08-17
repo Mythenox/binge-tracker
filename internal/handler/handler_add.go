@@ -41,7 +41,7 @@ func HandlerAddSeason(cmdContext context.Context, s *app.State, seasonNumber int
 
 	// check if show already exists in database
 
-	show, err := s.Q.GetShow(context.Background(), showTitle)
+	show, err := s.Q.GetShow(cmdContext, showTitle)
 	if err != nil {
 		return new(ShowNotFoundError)
 	}
@@ -95,7 +95,7 @@ func HandlerAddSeason(cmdContext context.Context, s *app.State, seasonNumber int
 
 	qtx := s.Q.WithTx(tx)
 
-	newSeason, err := qtx.AddSeason(context.Background(), database.AddSeasonParams{
+	newSeason, err := qtx.AddSeason(cmdContext, database.AddSeasonParams{
 		SeasonNumber:  int64(seasonNumber),
 		TotalEpisodes: int64(episodeCount - 1),
 		ShowTitle:     showTitle,
@@ -105,7 +105,7 @@ func HandlerAddSeason(cmdContext context.Context, s *app.State, seasonNumber int
 	}
 
 	for _, episode := range episodes {
-		_, err := qtx.AddEpisode(context.Background(), episode)
+		_, err := qtx.AddEpisode(cmdContext, episode)
 		if err != nil {
 			return fmt.Errorf("error adding episode to database: %w", err)
 		}
@@ -130,7 +130,7 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 	seasonNumber, episodeNumber int, showTitle, episodePath string) error {
 	// check if show is in database
 
-	show, err := s.Q.GetShow(context.Background(), showTitle)
+	show, err := s.Q.GetShow(cmdContext, showTitle)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return new(ShowNotFoundError)
@@ -168,7 +168,7 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 
 	qtx := s.Q.WithTx(tx)
 
-	_, err = qtx.AddEpisode(context.Background(), database.AddEpisodeParams{
+	_, err = qtx.AddEpisode(cmdContext, database.AddEpisodeParams{
 		EpisodeNumber: int64(episodeNumber),
 		Filepath:      episodePath,
 		Runtime:       runtime,
