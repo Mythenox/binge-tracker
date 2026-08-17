@@ -13,16 +13,18 @@ const updateSeason = `-- name: UpdateSeason :one
 UPDATE seasons
 SET
     unwatched_episodes = ?1,
-    finished = ?2
+    finished = ?2,
+    total_episodes = ?3
 WHERE
-    show_title = ?3 AND
-    season_number = ?4
+    show_title = ?4 AND
+    season_number = ?5
 RETURNING season_number, total_episodes, unwatched_episodes, finished, show_title
 `
 
 type UpdateSeasonParams struct {
 	UnwatchedEpisodes int64
 	Finished          bool
+	TotalEpisodes     int64
 	ShowTitle         string
 	SeasonNumber      int64
 }
@@ -31,6 +33,7 @@ func (q *Queries) UpdateSeason(ctx context.Context, arg UpdateSeasonParams) (Sea
 	row := q.db.QueryRowContext(ctx, updateSeason,
 		arg.UnwatchedEpisodes,
 		arg.Finished,
+		arg.TotalEpisodes,
 		arg.ShowTitle,
 		arg.SeasonNumber,
 	)

@@ -13,21 +13,20 @@ const addShow = `-- name: AddShow :one
 INSERT INTO shows(title, seasons, total_episodes, unwatched_episodes)
 VALUES (
     ?1,
+    1,
     ?2,
-    ?3,
-    ?3
+    ?2
 )
 RETURNING id, title, seasons, total_episodes, unwatched_episodes
 `
 
 type AddShowParams struct {
 	Title         string
-	Seasons       int64
 	TotalEpisodes int64
 }
 
 func (q *Queries) AddShow(ctx context.Context, arg AddShowParams) (Show, error) {
-	row := q.db.QueryRowContext(ctx, addShow, arg.Title, arg.Seasons, arg.TotalEpisodes)
+	row := q.db.QueryRowContext(ctx, addShow, arg.Title, arg.TotalEpisodes)
 	var i Show
 	err := row.Scan(
 		&i.ID,

@@ -12,19 +12,28 @@ import (
 const updateShow = `-- name: UpdateShow :one
 UPDATE shows
 SET
-    unwatched_episodes = ?1
+    unwatched_episodes = ?1,
+    total_episodes = ?2,
+    seasons = ?3
 WHERE
-    title = ?2
+    title = ?4
 RETURNING id, title, seasons, total_episodes, unwatched_episodes
 `
 
 type UpdateShowParams struct {
 	UnwatchedEpisodes int64
+	TotalEpisodes     int64
+	Seasons           int64
 	ShowTitle         string
 }
 
 func (q *Queries) UpdateShow(ctx context.Context, arg UpdateShowParams) (Show, error) {
-	row := q.db.QueryRowContext(ctx, updateShow, arg.UnwatchedEpisodes, arg.ShowTitle)
+	row := q.db.QueryRowContext(ctx, updateShow,
+		arg.UnwatchedEpisodes,
+		arg.TotalEpisodes,
+		arg.Seasons,
+		arg.ShowTitle,
+	)
 	var i Show
 	err := row.Scan(
 		&i.ID,

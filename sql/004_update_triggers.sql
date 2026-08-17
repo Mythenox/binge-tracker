@@ -39,5 +39,7 @@ END;
 -- +goose StatementEnd
 
 -- +goose Down
+-- +goose StatementBegin
 DROP TRIGGER IF EXISTS decrement_unwatched_episodes;
 DROP TRIGGER IF EXISTS increment_unwatched_episodes;
+-- +goose StatementEnd

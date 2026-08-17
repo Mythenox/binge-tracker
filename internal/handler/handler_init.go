@@ -87,7 +87,6 @@ func HandlerInit(c context.Context,
 
 	_, err = s.Q.AddShow(context.Background(), database.AddShowParams{
 		Title:         showTitle,
-		Seasons:       1,
 		TotalEpisodes: int64(episodeCount - 1),
 	})
 	if err != nil {
@@ -110,7 +109,7 @@ func HandlerInit(c context.Context,
 		}
 	}
 
-	fmt.Printf("Successfully added %d episodes of season %d of %s.\n", season.TotalEpisodes, season.SeasonNumber, season.ShowTitle)
+	fmt.Printf("Successfully added %d episodes of season %d of %s.\n", episodeCount-1, season.SeasonNumber, season.ShowTitle)
 
 	return nil
 }

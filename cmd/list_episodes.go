@@ -9,6 +9,7 @@ import (
 )
 
 // bingetracker list seasons Twin Peaks
+// verbose flag for listing filepath as well
 
 // episodesCmd represents the episodes command
 var episodesCmd = &cobra.Command{

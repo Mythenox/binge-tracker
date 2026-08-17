@@ -30,6 +30,12 @@ func (*ShowWatchedErr) Error() string {
 	return "All episodes of this show have been watched."
 }
 
+type EpisodeNotFoundErr struct{}
+
+func (*EpisodeNotFoundErr) Error() string {
+	return "The specified episode was not found in the database."
+}
+
 func HandlerPlayNext(
 	cmdContext context.Context,
 	s *app.State,
@@ -102,6 +108,9 @@ func HandlerPlayMPV(
 		EpisodeNumber: int64(episodeNumber),
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return new(EpisodeNotFoundErr)
+		}
 		return err
 	}
 
@@ -192,8 +201,21 @@ func updateDB(cmdContext context.Context, s *app.State,
 	}
 
 	if watched {
+		tx, err := s.DB.Begin()
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		qtx := s.Q.WithTx(tx)
+
+		cascadeWatchStatus(cmdContext, qtx, episode.ShowTitle,
+			episode.SeasonNumber, 1, true)
+
 		fmt.Printf("You finished watching s%de%d of %s.\n",
 			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
+
+		return tx.Commit()
 	} else {
 		fmt.Printf("You did not finish watching s%de%d of %s.\n",
 			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
