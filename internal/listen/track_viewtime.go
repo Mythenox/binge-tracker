@@ -6,12 +6,8 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
 	"os/exec"
 	"strconv"
-	"time"
-
-	"github.com/Microsoft/go-winio"
 )
 
 type mpvEvent struct {
@@ -26,25 +22,13 @@ type vlcEvent struct {
 
 // mpv <filename> --input-ipc-server <socket filepath> --script= <script filepath>
 
-func TrackViewTimeMPVLinux(socketPath string) (float64, error) {
-	socketReady := false
-	for range 50 { // try for up to 5 seconds
-		if _, err := os.Stat(socketPath); err == nil {
-			socketReady = true
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-
-	if !socketReady {
-		return 0.0, fmt.Errorf("timed out waiting for mpv socket at %s", socketPath)
-	}
-
-	conn, err := net.Dial("unix", socketPath)
+func TrackViewTimeMPV(connPath string) (float64, error) {
+	conn, err := connectToPlayer(connPath)
 	if err != nil {
-		log.Fatalf("Unable to connect to socket: %v", err)
+		return 0.0, fmt.Errorf("Error connecting to player: %v", err)
 	}
-	fmt.Printf("Connected to unix socket %s...\n", socketPath)
+
+	fmt.Println("Connected to mpv player...")
 
 	defer conn.Close()
 
@@ -71,23 +55,6 @@ func TrackViewTimeMPVLinux(socketPath string) (float64, error) {
 			return finalTimePos, nil
 		}
 	}
-}
-
-func TrackViewTimeMPVWin(pipePath string) {
-	fmt.Printf("Connecting to mpv pipe at %s...\n", pipePath)
-
-	// Set a timeout duration for the initial connection
-	timeout := 10 * time.Second
-
-	// Connect to the Windows Named Pipe
-	winio.DialPipe
-	conn, err := winio.DialPipe(pipePath, &timeout)
-	if err != nil {
-		log.Fatalf("Error connecting to pipe: %v. Is mpv running?", err)
-	}
-	defer conn.Close()
-
-	fmt.Println("Connected! Listening for the video stop JSON payload...")
 }
 
 // VLC <filename> --extraintf luaintf --lua-intf <script filepath>

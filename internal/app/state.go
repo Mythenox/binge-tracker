@@ -23,6 +23,7 @@ type State struct {
 type Config struct {
 	DBPath               string `json:"db_path"`
 	SocketPath           string `json:"socket_path"`
+	PipePath             string `json:"pipe_path"`
 	ScriptPath           string `json:"script_path"`
 	CountPartialProgress bool   `json:"count_partial_progress"`
 	VideoPlayer          string `json:"video_player"`

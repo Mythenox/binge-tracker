@@ -164,7 +164,19 @@ func HandlerPlayMPV(
 		log.Println("Process exited gracefully on its own.")
 	}()
 
-	viewtime, err := listen.TrackViewTimeMPVLinux(s.Cfg.SocketPath)
+	/*
+		var connPath string
+		os := runtime.GOOS
+		if os == "windows" {
+			connPath = s.Cfg.PipePath
+		} else {
+			connPath = s.Cfg.SocketPath
+		}
+
+		viewtime, err := listen.TrackViewTimeMPV(connPath)
+	*/
+
+	viewtime, err := listen.TrackViewTimeMPV(s.Cfg.SocketPath)
 	if err != nil {
 		return err
 	}
