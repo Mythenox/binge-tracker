@@ -145,3 +145,34 @@ func HandlerRemoveShow(cmdContext context.Context, s *app.State, showTitle strin
 
 	return nil
 }
+
+func HandlerReset(cmdContext context.Context, s *app.State) error {
+	shows, err := s.Q.GetAllShows(cmdContext)
+	if err != nil {
+		return err
+	}
+
+	if len(shows) == 0 {
+		fmt.Println("No shows have been initialized.")
+		return nil
+	}
+
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	qtx := s.Q.WithTx(tx)
+
+	for _, show := range shows {
+		err = qtx.RemoveShow(cmdContext, show.Title)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Successfully reset database.")
+
+	return tx.Commit()
+}

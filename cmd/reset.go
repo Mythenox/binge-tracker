@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/mythenox/binge-tracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +20,24 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("reset called")
+	Args: cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
 
-		// ask for confirmation
+		fmt.Print("The following command will completely reset the database, including all seasons and shows. Continue? (Y/n) ")
+		userInput := ""
+		fmt.Scanln(&userInput)
+
+		if userInput == "Y" || userInput == "y" {
+			err := handler.HandlerReset(cmd.Context(), s)
+			if err != nil {
+				fmt.Println("Error resetting database:", err)
+				return err
+			}
+		} else {
+			fmt.Println("Reset aborted.")
+		}
+
+		return nil
 	},
 }
 

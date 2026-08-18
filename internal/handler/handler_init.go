@@ -16,6 +16,8 @@ import (
 	"github.com/mythenox/binge-tracker/internal/database"
 )
 
+// make sure to require ffprobe, comes with mpv but not vlc
+
 type ShowExistsError struct{}
 
 func (*ShowExistsError) Error() string {

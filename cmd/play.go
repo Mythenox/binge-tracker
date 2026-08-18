@@ -25,7 +25,6 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cmd.Println("play called")
 		dashIndex := cmd.ArgsLenAtDash()
 		if dashIndex == -1 {
 			dashIndex = len(args)
@@ -62,7 +61,15 @@ to quickly create a Cobra application.`,
 				playerArgs,
 			)
 		case "vlc":
-			return errors.New("vlc not implemented yet")
+			return handler.HandlerPlayVLC(
+				cmd.Context(),
+				s,
+				showTitle,
+				seasonNumber,
+				episodeNumber,
+				restart,
+				playerArgs,
+			)
 		default:
 			return errors.New("unsupported player")
 		}

@@ -89,8 +89,15 @@ func HandlerPlayNext(
 			playerArgs,
 		)
 	} else {
-		// insert HandlerPlayVLC here
-		return nil
+		return HandlerPlayVLC(
+			cmdContext,
+			s,
+			showTitle,
+			int(currentSeasonNumber),
+			int(nextEpisode.EpisodeNumber),
+			false,
+			playerArgs,
+		)
 	}
 }
 
@@ -157,7 +164,7 @@ func HandlerPlayMPV(
 		log.Println("Process exited gracefully on its own.")
 	}()
 
-	viewtime, err := listen.TrackViewTime(s.Cfg.SocketPath)
+	viewtime, err := listen.TrackViewTimeMPVLinux(s.Cfg.SocketPath)
 	if err != nil {
 		return err
 	}
@@ -170,14 +177,68 @@ func HandlerPlayMPV(
 	return nil
 }
 
-func handlerPlayVLC(
-	c context.Context,
+// place lua file in ~/.local/share/vlc/lua/intf
+
+func HandlerPlayVLC(
+	cmdContext context.Context,
 	s *app.State,
 	showTitle string,
 	seasonNumber, episodeNumber int,
 	restart bool,
 	playerArgs []string,
-) {
+) error {
+	episode, err := s.Q.GetEpisode(cmdContext, database.GetEpisodeParams{
+		ShowTitle:     showTitle,
+		SeasonNumber:  int64(seasonNumber),
+		EpisodeNumber: int64(episodeNumber),
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return new(EpisodeNotFoundErr)
+		}
+		return err
+	}
+
+	// if the episode was previously fully watched, the user choosing to play it again
+	// most likely wants to watch it again from the beginning
+
+	if int(episode.Viewtime) == int(episode.Runtime) {
+		restart = true
+	}
+
+	vlcFlags := []string{
+		episode.Filepath,
+		"--extraintf=luaintf",
+		"--lua-intf=tcptracker",
+	}
+	vlcFlags = append(vlcFlags, playerArgs...)
+
+	// decide what timestamp to start the file at
+
+	if restart {
+		vlcFlags = append(vlcFlags, "--start-time=0")
+	} else if episode.Viewtime != 0.0 {
+		startFlag := fmt.Sprintf("--start-time=%f", episode.Viewtime)
+		vlcFlags = append(vlcFlags, startFlag)
+	}
+
+	playerCmd := exec.Command("vlc", vlcFlags...)
+	playerCmd.Env = append(os.Environ(),
+		"XDG_DATA_HOME="+os.Getenv("HOME")+"/.local/share")
+
+	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, showTitle)
+
+	viewtime, err := listen.TrackViewTimeVLC(playerCmd)
+	if err != nil {
+		return err
+	}
+
+	err = updateDB(cmdContext, s, viewtime, episode)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func updateDB(cmdContext context.Context, s *app.State,
