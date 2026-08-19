@@ -71,7 +71,7 @@ func (s *State) ConnectDB() error {
 }
 
 func getConfigFilePath() (string, error) {
-	/*homedir, err := os.UserHomeDir()
+	homedir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
@@ -82,8 +82,6 @@ func getConfigFilePath() (string, error) {
 		return "", fmt.Errorf("An error has occurred while attempting to construct the config filepath")
 	}
 
-	return configFilePath, nil*/
-	configFilePath := filepath.Join(".", configFileName)
 	return configFilePath, nil
 }
 
