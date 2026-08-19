@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/database"
 )
 
 // s01e01-s02e06
@@ -118,7 +118,7 @@ func HandlerSetEpisodeCompletion(cmdContext context.Context, s *app.State, showT
 		if err != nil {
 			return err
 		}
-	} 
+	}
 
 	if setWatched {
 		fmt.Printf("Episode %d of season %d of %s has been set as watched.\n", episodeNumber,

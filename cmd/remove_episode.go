@@ -4,7 +4,7 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/mythenox/binge-tracker/internal/handler"
+	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 

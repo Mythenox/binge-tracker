@@ -9,8 +9,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/database"
 )
 
 type ShowNotInitializedErr struct{}

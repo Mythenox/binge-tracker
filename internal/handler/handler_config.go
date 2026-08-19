@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/mythenox/binge-tracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/app"
 )
 
 func HandlerSetConfig(cmdContext context.Context, s *app.State,

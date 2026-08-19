@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/mythenox/binge-tracker/internal/handler"
+	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 

@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/database"
 )
 
 func HandlerRemoveSeason(cmdContext context.Context, s *app.State, showTitle string,

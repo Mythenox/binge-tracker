@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/database"
 )
 
 type ShowNotFoundError struct{}

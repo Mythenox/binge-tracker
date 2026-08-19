@@ -1,4 +1,4 @@
-module github.com/mythenox/binge-tracker
+module github.com/mythenox/bingetracker
 
 go 1.26.5
 

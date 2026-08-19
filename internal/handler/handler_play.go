@@ -10,9 +10,9 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/database"
-	"github.com/mythenox/binge-tracker/internal/listen"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/listen"
 )
 
 // play [mpv, vlc] <show_name> <season_number> <episode_number> [optional extra mpv/vlc flags]

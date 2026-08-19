@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mythenox/binge-tracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/spf13/cobra"
 )
 

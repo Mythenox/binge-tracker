@@ -6,8 +6,8 @@ package cmd
 import (
 	"strings"
 
-	"github.com/mythenox/binge-tracker/internal/app"
-	"github.com/mythenox/binge-tracker/internal/handler"
+	"github.com/mythenox/bingetracker/internal/app"
+	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 

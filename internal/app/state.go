@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mythenox/binge-tracker/internal/database"
+	"github.com/mythenox/bingetracker/internal/database"
 	_ "modernc.org/sqlite"
 )
 
