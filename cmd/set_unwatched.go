@@ -15,10 +15,10 @@ var setUnwatchedCmd = &cobra.Command{
 	Short: "Sets an episode or range of episodes as unwatched",
 	Long: `This command sets an episode or range of episodes as unwatched. Can also input a season or range of seasons to set entire seasons as unwatched in bulk.
 Usage example: 'bingetracker set unwatched Twin Peaks s01-s02'`,
-	Args: cobra.ExactArgs(2),
+	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		inputIsRange := strings.Contains(args[1], "-")
-		episodeMode := strings.Contains(args[1], "e")
+		inputIsRange := strings.Contains(args[len(args)-1], "-")
+		episodeMode := strings.Contains(args[len(args)-1], "e")
 
 		return setCompletion(cmd, args, s, inputIsRange, episodeMode, false)
 	},

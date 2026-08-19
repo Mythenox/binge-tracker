@@ -11,6 +11,8 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type ShowNotInitializedErr struct{}
@@ -71,7 +73,9 @@ func HandlerListEpisodes(
 		}
 	}
 
-	fmt.Printf("%s Season %d episodes:\n", showTitle, seasonNumber)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("%s Season %d episodes:\n", caser.String(showTitle), seasonNumber)
 	w.Flush()
 
 	return nil
@@ -100,7 +104,9 @@ func HandlerListSeasons(cmdContext context.Context, s *app.State, showTitle stri
 		fmt.Fprintln(w, line)
 	}
 
-	fmt.Printf("%s seasons:\n", showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("%s seasons:\n", caser.String(showTitle))
 	w.Flush()
 
 	return nil
@@ -142,9 +148,19 @@ func formatDurationHMMSS(seconds int64) (string, error) {
 		return "", err
 	}
 
-	t := time.Unix(0, 0).UTC().Add(d)
+	h := d / time.Hour
+	d -= h * time.Hour
 
-	return t.Format("04:05"), nil
+	m := d / time.Minute
+	d -= m * time.Minute
+
+	s := d / time.Second
+
+	if h == 0 {
+		return fmt.Sprintf("%02d:%02d", m, s), nil
+	}
+
+	return fmt.Sprintf("%d:%02d:%02d", h, m, s), nil
 }
 
 func formatEpisodeIdentifier(seasonNumber, episodeNumber int64) string {

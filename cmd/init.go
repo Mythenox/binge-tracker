@@ -4,9 +4,7 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"errors"
-	"regexp"
-	"strconv"
+	"strings"
 
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
@@ -19,28 +17,18 @@ var initCmd = &cobra.Command{
 	Long: `initiate a show to be tracked. requires show name, season to be added, and dirpath of the season.
 ex: bingetracker init "twin peaks" s01 videos/twin-peaks-s01
 automatically adds all episodes found in given directory`,
-	Args: cobra.ExactArgs(3),
+	Args: cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// ex: bingetracker init "twin peaks" s01 videos/twin-peaks-s01
-		seasonRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
+		showTitleWords := args[:len(args)-2]
+		seasonIdentifier := args[len(args)-2]
+		seasonDirPath := args[len(args)-1]
 
-		showTitle := cmd.Flags().Args()[0]
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
-		seasonIdentifier := cmd.Flags().Args()[1]
-		matches := seasonRegex.FindStringSubmatch(seasonIdentifier)
-		if len(matches) != 2 {
-			return errors.New("Invalid format")
-		}
-
-		seasonNumber, err := strconv.Atoi(matches[1])
+		seasonNumber, err := extractFromSeasonIdentifier(seasonIdentifier)
 		if err != nil {
 			return err
 		}
-		if seasonNumber < 0 {
-			return errors.New("Season numbers must be non-negative")
-		}
-
-		seasonDirPath := cmd.Flags().Args()[2]
 
 		return handler.HandlerInit(
 			cmd.Context(),

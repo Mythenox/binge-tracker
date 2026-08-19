@@ -13,6 +13,8 @@ import (
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
 	"github.com/mythenox/bingetracker/internal/listen"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // play [mpv, vlc] <show_name> <season_number> <episode_number> [optional extra mpv/vlc flags]
@@ -157,7 +159,9 @@ func HandlerPlayMPV(
 
 	os.Remove(connPath)
 
-	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, caser.String(showTitle))
 
 	err = playerCmd.Start()
 	if err != nil {
@@ -235,7 +239,9 @@ func HandlerPlayVLC(
 	playerCmd.Env = append(os.Environ(),
 		"XDG_DATA_HOME="+os.Getenv("HOME")+"/.local/share")
 
-	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, caser.String(showTitle))
 
 	viewtime, err := listen.TrackViewTimeVLC(playerCmd)
 	if err != nil {
@@ -270,6 +276,8 @@ func updateDB(cmdContext context.Context, s *app.State,
 		return err
 	}
 
+	caser := cases.Title(language.English)
+
 	if watched {
 		tx, err := s.DB.Begin()
 		if err != nil {
@@ -283,12 +291,12 @@ func updateDB(cmdContext context.Context, s *app.State,
 			episode.SeasonNumber, 1, true)
 
 		fmt.Printf("You finished watching s%de%d of %s.\n",
-			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
+			episode.SeasonNumber, episode.EpisodeNumber, caser.String(episode.ShowTitle))
 
 		return tx.Commit()
 	} else {
 		fmt.Printf("You did not finish watching s%de%d of %s.\n",
-			episode.SeasonNumber, episode.EpisodeNumber, episode.ShowTitle)
+			episode.SeasonNumber, episode.EpisodeNumber, caser.String(episode.ShowTitle))
 	}
 
 	return nil

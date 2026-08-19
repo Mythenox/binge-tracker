@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -15,11 +17,13 @@ var addEpisodeCmd = &cobra.Command{
 	Use:     "episode <show title> <episode identifier> <episode path>",
 	Short:   "Add an episode to a season of a show",
 	Example: "add episode Twin Peaks s02e01 ~/Downloads/twin_peaks_s02_e01.mp4",
-	Args:    cobra.ExactArgs(3),
+	Args:    cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
-		episodeIdentifier := args[1]
-		episodePath := args[3]
+		showTitleWords := args[:len(args)-2]
+		episodeIdentifier := args[len(args)-2]
+		episodePath := args[len(args)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
 		if err != nil {

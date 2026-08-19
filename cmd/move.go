@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -22,9 +24,11 @@ If the new target directory has a different number of episodes, user confirmatio
 Usage example: 'bingetracker move Twin Peaks s02 '~/Downloads/Twin Peaks S02'`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
-		seasonIdentifier := args[1]
-		seasonDirPath := args[2]
+		showTitleWords := args[:len(args)-2]
+		seasonIdentifier := args[len(args)-2]
+		seasonDirPath := args[len(args)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		seasonNumber, err := extractFromSeasonIdentifier(seasonIdentifier)
 		if err != nil {

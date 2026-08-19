@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -16,10 +18,12 @@ var removeSeasonCmd = &cobra.Command{
 	Short: "Removes the specified season from the database.",
 	Long: `This command removes the specified season from the database, along with all of its episodes.
 Usage example: 'bingetracker remove season Twin Peaks s02'`,
-	Args: cobra.ExactArgs(2),
+	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
-		seasonIdentifier := args[1]
+		showTitleWords := args[:len(args)-1]
+		seasonIdentifier := args[len(args)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		seasonNumber, err := extractFromSeasonIdentifier(seasonIdentifier)
 		if err != nil {

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
@@ -26,8 +27,8 @@ Usage example: 'bingetracker play Twin Peaks s01e01 -- --mute=yes'`,
 			dashIndex = len(args)
 		}
 
-		if dashIndex != 2 {
-			return fmt.Errorf("accepts exactly 2 args before '--', received %d", dashIndex)
+		if dashIndex < 2 {
+			return fmt.Errorf("needs at least 2 args before '--', received %d", dashIndex)
 		}
 
 		cmdArgs := args[:dashIndex]
@@ -35,8 +36,10 @@ Usage example: 'bingetracker play Twin Peaks s01e01 -- --mute=yes'`,
 
 		restart, _ := cmd.Flags().GetBool("restart")
 
-		showTitle := cmdArgs[0]
-		episodeIdentifier := cmdArgs[1]
+		showTitleWords := cmdArgs[:len(cmdArgs)-1]
+		episodeIdentifier := cmdArgs[len(cmdArgs)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
 		if err != nil {

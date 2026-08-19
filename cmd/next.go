@@ -4,10 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"regexp"
-	"strconv"
+	"strings"
 
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
@@ -16,7 +14,7 @@ import (
 // nextCmd represents the next command
 // play next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]
 var nextCmd = &cobra.Command{
-	Use:   "next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]",
+	Use:   "next <show name> [-- player flags]",
 	Short: "Plays the next episode of a show",
 	Long: `This command plays the next unwatched episode of the specified show.
 If a season identifier is provided, the command will ignore unwatched episodes that precede that season.
@@ -29,42 +27,37 @@ Usage example: 'bingetracker play next Twin Peaks -- --mute=yes'`,
 			dashIndex = len(args)
 		}
 
-		if dashIndex > 2 {
-			return fmt.Errorf("accepts at most 2 args before '--', received %d", dashIndex)
+		if dashIndex < 1 {
+			return fmt.Errorf("needs at least 1 arg before '--', received %d", dashIndex)
 		}
 
-		cmdArgs := args[:dashIndex]
+		showTitle := strings.ToLower(strings.Join(args[:dashIndex], " "))
 		playerArgs := args[dashIndex:]
 
-		showTitle := cmdArgs[0]
-		verboseInput := dashIndex == 2
 		var seasonNumber int
 		// seasonNumber is ignored by handler if verboseInput == false
 
-		if verboseInput {
-			episodeRegex := regexp.MustCompile(`(?i)^s(\d+)$`)
-
-			seasonIdentifier := cmdArgs[1]
-
-			matches := episodeRegex.FindStringSubmatch(seasonIdentifier)
-			if len(matches) != 2 {
-				return errors.New("Invalid format")
+		if cmd.Flags().Changed("start-from") {
+			seasonIdentifier, err := cmd.Flags().GetString("start-from")
+			if err != nil {
+				return err
 			}
 
-			var err error
-			seasonNumber, err = strconv.Atoi(matches[1])
+			seasonNumber, err = extractFromSeasonIdentifier(seasonIdentifier)
 			if err != nil {
 				return err
 			}
 		}
 
 		return handler.HandlerPlayNext(cmd.Context(), s, showTitle, seasonNumber,
-			verboseInput, playerArgs)
+			cmd.Flags().Changed("start-from"), playerArgs)
 	},
 }
 
 func init() {
 	playCmd.AddCommand(nextCmd)
+	playCmd.Flags().StringP("start-from", "s", "",
+		"Find the next unwatched episode from the provided season, ignoring seasons preceding it")
 
 	// Here you will define your flags and configuration settings.
 

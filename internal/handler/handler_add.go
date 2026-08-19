@@ -11,23 +11,25 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
-type ShowNotFoundError struct{}
+type ShowNotFoundErr struct{}
 
-func (*ShowNotFoundError) Error() string {
+func (*ShowNotFoundErr) Error() string {
 	return "The specified show was not found in the database."
 }
 
-type SeasonNotFoundError struct{}
+type SeasonNotFoundErr struct{}
 
-func (*SeasonNotFoundError) Error() string {
+func (*SeasonNotFoundErr) Error() string {
 	return "The specified season was not found in the database."
 }
 
-type InvalidFileTypeError struct{}
+type InvalidFileTypeErr struct{}
 
-func (*InvalidFileTypeError) Error() string {
+func (*InvalidFileTypeErr) Error() string {
 	return "The specified file has an unsupported file type."
 }
 
@@ -43,7 +45,7 @@ func HandlerAddSeason(cmdContext context.Context, s *app.State, seasonNumber int
 
 	show, err := s.Q.GetShow(cmdContext, showTitle)
 	if err != nil {
-		return new(ShowNotFoundError)
+		return new(ShowNotFoundErr)
 	}
 
 	var episodes []database.AddEpisodeParams
@@ -118,8 +120,10 @@ func HandlerAddSeason(cmdContext context.Context, s *app.State, seasonNumber int
 		Seasons:           show.Seasons + 1,
 	})
 
+	caser := cases.Title(language.English)
+
 	fmt.Printf("Successfully added %d episodes of season %d of %s.\n",
-		newSeason.TotalEpisodes, newSeason.SeasonNumber, newSeason.ShowTitle)
+		newSeason.TotalEpisodes, newSeason.SeasonNumber, caser.String(newSeason.ShowTitle))
 
 	return tx.Commit()
 }
@@ -133,7 +137,7 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 	show, err := s.Q.GetShow(cmdContext, showTitle)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(ShowNotFoundError)
+			return new(ShowNotFoundErr)
 		}
 		return err
 	}
@@ -143,7 +147,7 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(SeasonNotFoundError)
+			return new(SeasonNotFoundErr)
 		}
 		return err
 	}
@@ -152,7 +156,7 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 
 	ext := filepath.Ext(episodePath)
 	if len(ext) == 0 || !slices.Contains(supportedFormats, ext) {
-		return new(InvalidFileTypeError)
+		return new(InvalidFileTypeErr)
 	}
 
 	runtime, err := getVideoDuration(episodePath)
@@ -196,7 +200,9 @@ func HandlerAddEpisode(cmdContext context.Context, s *app.State,
 
 	episodeIdentifier := formatEpisodeIdentifier(int64(seasonNumber), int64(episodeNumber))
 
-	fmt.Printf("Successfully added %s of %s.\n", episodeIdentifier, showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Successfully added %s of %s.\n", episodeIdentifier, caser.String(showTitle))
 
 	return tx.Commit()
 }

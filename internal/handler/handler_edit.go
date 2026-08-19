@@ -8,6 +8,8 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // s01e01-s02e06
@@ -83,12 +85,14 @@ func HandlerSetEpisodeRangeCompletion(cmdContext context.Context, s *app.State, 
 	start := formatEpisodeIdentifier(int64(startSeason), int64(startEpisode))
 	end := formatEpisodeIdentifier(int64(endSeason), int64(endEpisode))
 
+	caser := cases.Title(language.English)
+
 	if setWatched {
 		fmt.Printf("All episodes between %s and %s of %s have been set as watched.\n", start,
-			end, showTitle)
+			end, caser.String(showTitle))
 	} else {
 		fmt.Printf("All episodes between %s and %s of %s have been set as unwatched.\n", start,
-			end, showTitle)
+			end, caser.String(showTitle))
 	}
 
 	return tx.Commit()
@@ -120,12 +124,14 @@ func HandlerSetEpisodeCompletion(cmdContext context.Context, s *app.State, showT
 		}
 	}
 
+	caser := cases.Title(language.English)
+
 	if setWatched {
 		fmt.Printf("Episode %d of season %d of %s has been set as watched.\n", episodeNumber,
-			seasonNumber, showTitle)
+			seasonNumber, caser.String(showTitle))
 	} else {
 		fmt.Printf("Episode %d of season %d of %s has been set as unwatched.\n", episodeNumber,
-			seasonNumber, showTitle)
+			seasonNumber, caser.String(showTitle))
 	}
 
 	return tx.Commit()
@@ -150,7 +156,7 @@ func HandlerSetSeasonRangeCompletion(cmdContext context.Context, s *app.State, s
 		})
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return new(SeasonNotFoundError)
+				return new(SeasonNotFoundErr)
 			}
 			return err
 		}
@@ -175,12 +181,14 @@ func HandlerSetSeasonRangeCompletion(cmdContext context.Context, s *app.State, s
 		return err
 	}
 
+	caser := cases.Title(language.English)
+
 	if setWatched {
 		fmt.Printf("Seasons %d to %d of %s have been set as finished.\n", startSeason,
-			endSeason, showTitle)
+			endSeason, caser.String(showTitle))
 	} else {
 		fmt.Printf("Seasons %d to %d of %s have been set as unfinished.\n", startSeason,
-			endSeason, showTitle)
+			endSeason, caser.String(showTitle))
 	}
 
 	return tx.Commit()
@@ -201,7 +209,7 @@ func HandlerSetSeasonCompletion(cmdContext context.Context, s *app.State, showTi
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(SeasonNotFoundError)
+			return new(SeasonNotFoundErr)
 		}
 		return err
 	}
@@ -223,10 +231,12 @@ func HandlerSetSeasonCompletion(cmdContext context.Context, s *app.State, showTi
 		return err
 	}
 
+	caser := cases.Title(language.English)
+
 	if setWatched {
-		fmt.Printf("Season %d of %s has been set as finished.\n", seasonNumber, showTitle)
+		fmt.Printf("Season %d of %s has been set as finished.\n", seasonNumber, caser.String(showTitle))
 	} else {
-		fmt.Printf("Season %d of %s has been set as unfinished.\n", seasonNumber, showTitle)
+		fmt.Printf("Season %d of %s has been set as unfinished.\n", seasonNumber, caser.String(showTitle))
 	}
 
 	return tx.Commit()
@@ -240,8 +250,11 @@ func updateEpisodeWatchStatus(
 		if errors.Is(err, sql.ErrNoRows) {
 			episodeIdentifier := formatEpisodeIdentifier(e.SeasonNumber,
 				e.EpisodeNumber)
-			return false, fmt.Errorf("The episode %s of %s does was not found in the database.",
-				episodeIdentifier, e.ShowTitle)
+
+			caser := cases.Title(language.English)
+
+			return false, fmt.Errorf("The episode %s of %s was not found in the database.",
+				episodeIdentifier, caser.String(e.ShowTitle))
 		}
 		return false, err
 	}

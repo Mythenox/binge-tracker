@@ -8,6 +8,8 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func HandlerRemoveSeason(cmdContext context.Context, s *app.State, showTitle string,
@@ -16,7 +18,7 @@ func HandlerRemoveSeason(cmdContext context.Context, s *app.State, showTitle str
 
 	show, err := s.Q.GetShow(context.Background(), showTitle)
 	if err != nil {
-		return new(ShowNotFoundError)
+		return new(ShowNotFoundErr)
 	}
 
 	season, err := s.Q.GetSeason(cmdContext, database.GetSeasonParams{
@@ -24,7 +26,7 @@ func HandlerRemoveSeason(cmdContext context.Context, s *app.State, showTitle str
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(ShowNotFoundError)
+			return new(ShowNotFoundErr)
 		}
 	}
 
@@ -47,8 +49,10 @@ func HandlerRemoveSeason(cmdContext context.Context, s *app.State, showTitle str
 		UnwatchedEpisodes: show.UnwatchedEpisodes - season.UnwatchedEpisodes,
 	})
 
+	caser := cases.Title(language.English)
+
 	fmt.Printf("Successfully removed season %d of %s.\n",
-		seasonNumber, showTitle)
+		seasonNumber, caser.String(showTitle))
 
 	return tx.Commit()
 }
@@ -62,7 +66,7 @@ func HandlerRemoveEpisode(cmdContext context.Context, s *app.State,
 	show, err := s.Q.GetShow(context.Background(), showTitle)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(ShowNotFoundError)
+			return new(ShowNotFoundErr)
 		}
 		return err
 	}
@@ -72,7 +76,7 @@ func HandlerRemoveEpisode(cmdContext context.Context, s *app.State,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(SeasonNotFoundError)
+			return new(SeasonNotFoundErr)
 		}
 		return err
 	}
@@ -125,7 +129,9 @@ func HandlerRemoveEpisode(cmdContext context.Context, s *app.State,
 
 	episodeIdentifier := formatEpisodeIdentifier(int64(seasonNumber), int64(episodeNumber))
 
-	fmt.Printf("Successfully removed %s of %s.\n", episodeIdentifier, showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Successfully removed %s of %s.\n", episodeIdentifier, caser.String(showTitle))
 
 	return tx.Commit()
 }
@@ -133,7 +139,7 @@ func HandlerRemoveEpisode(cmdContext context.Context, s *app.State,
 func HandlerRemoveShow(cmdContext context.Context, s *app.State, showTitle string) error {
 	_, err := s.Q.GetShow(context.Background(), showTitle)
 	if err != nil {
-		return new(ShowNotFoundError)
+		return new(ShowNotFoundErr)
 	}
 
 	err = s.Q.RemoveShow(cmdContext, showTitle)
@@ -141,7 +147,9 @@ func HandlerRemoveShow(cmdContext context.Context, s *app.State, showTitle strin
 		return err
 	}
 
-	fmt.Printf("Successfully removed %s.\n", showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Successfully removed %s.\n", caser.String(showTitle))
 
 	return nil
 }

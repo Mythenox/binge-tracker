@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -13,9 +15,9 @@ var listSeasonsCmd = &cobra.Command{
 	Use:   "seasons <show title>",
 	Short: "Lists all seasons of the specified show",
 	Long:  `Lists all seasons of the specified show, as well as episode watch progress for each season.`,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
+		showTitle := strings.ToLower(strings.Join(args, " "))
 		return handler.HandlerListSeasons(cmd.Context(), s, showTitle)
 	},
 }

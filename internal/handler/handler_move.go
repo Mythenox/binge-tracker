@@ -12,6 +12,8 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func HandlerMoveSeason(cmdContext context.Context, s *app.State, seasonNumber int,
@@ -27,7 +29,7 @@ func HandlerMoveSeason(cmdContext context.Context, s *app.State, seasonNumber in
 
 	show, err := s.Q.GetShow(cmdContext, showTitle)
 	if err != nil {
-		return new(ShowNotFoundError)
+		return new(ShowNotFoundErr)
 	}
 
 	season, err := s.Q.GetSeason(cmdContext, database.GetSeasonParams{
@@ -35,7 +37,7 @@ func HandlerMoveSeason(cmdContext context.Context, s *app.State, seasonNumber in
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return new(SeasonNotFoundError)
+			return new(SeasonNotFoundErr)
 		}
 		return err
 	}
@@ -83,9 +85,12 @@ func HandlerMoveSeason(cmdContext context.Context, s *app.State, seasonNumber in
 		return errors.New("No valid files found in given directory")
 	} else if episodeCount-1 != int(season.TotalEpisodes) {
 		var userResponse string
+
+		caser := cases.Title(language.English)
+
 		fmt.Scanf(`WARNING: The number of episodes differs between the new and old
 directories of Season %d of %s. Old episode viewing history must be overwritten
-in order to use this new directory. Proceed? (Y/n): `, seasonNumber, showTitle)
+in order to use this new directory. Proceed? (Y/n): `, seasonNumber, caser.String(showTitle))
 		fmt.Scanln(&userResponse)
 		if strings.ToLower(userResponse) == "n" {
 			fmt.Println("Move operation aborted.")
@@ -143,7 +148,9 @@ in order to use this new directory. Proceed? (Y/n): `, seasonNumber, showTitle)
 		}
 	}
 
-	fmt.Printf("Successfully moved directory of season %d of %s.\n", seasonNumber, showTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Successfully moved directory of season %d of %s.\n", seasonNumber, caser.String(showTitle))
 
 	return tx.Commit()
 }

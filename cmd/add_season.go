@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -15,11 +17,13 @@ var addSeasonCmd = &cobra.Command{
 	Use:     "season <show title> <season identifier> <season directory path>",
 	Short:   "Add a new season to an existing show",
 	Example: "add season Twin Peaks s02 '~/Downloads/Twin Peaks Season 2'",
-	Args:    cobra.ExactArgs(3),
+	Args:    cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
-		seasonIdentifier := args[1]
-		seasonDirPath := args[2]
+		showTitleWords := args[:len(args)-2]
+		seasonIdentifier := args[len(args)-2]
+		seasonDirPath := args[len(args)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		seasonNumber, err := extractFromSeasonIdentifier(seasonIdentifier)
 		if err != nil {

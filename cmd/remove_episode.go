@@ -4,6 +4,8 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"strings"
+
 	"github.com/mythenox/bingetracker/internal/handler"
 	"github.com/spf13/cobra"
 )
@@ -14,10 +16,12 @@ import (
 var removeEpisodeCmd = &cobra.Command{
 	Use:   "episode <show title> <episode identifier>",
 	Short: "Removes the specified episode from the database.",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		showTitle := args[0]
-		episodeIdentifier := args[1]
+		showTitleWords := args[:len(args)-1]
+		episodeIdentifier := args[len(args)-1]
+
+		showTitle := strings.ToLower(strings.Join(showTitleWords, " "))
 
 		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
 		if err != nil {

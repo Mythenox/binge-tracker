@@ -14,6 +14,8 @@ import (
 
 	"github.com/mythenox/bingetracker/internal/app"
 	"github.com/mythenox/bingetracker/internal/database"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // make sure to require ffprobe, comes with mpv but not vlc
@@ -111,7 +113,10 @@ func HandlerInit(c context.Context,
 		}
 	}
 
-	fmt.Printf("Successfully added %d episodes of season %d of %s.\n", episodeCount-1, season.SeasonNumber, season.ShowTitle)
+	caser := cases.Title(language.English)
+
+	fmt.Printf("Successfully added %d episodes of season %d of %s.\n", episodeCount-1, season.SeasonNumber,
+		caser.String(season.ShowTitle))
 
 	return nil
 }
