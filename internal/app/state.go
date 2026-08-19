@@ -87,10 +87,10 @@ func getConfigFilePath() (string, error) {
 	return configFilePath, nil
 }
 
-func (s *State) writeConfig() error {
+func (s *State) WriteConfig() error {
 	jsonData, err := json.Marshal(s.Cfg)
 	if err != nil {
-		fmt.Println("An error has occurred while attempting unmarshal JSON data")
+		fmt.Println("An error has occurred while attempting to unmarshal JSON data")
 		return err
 	}
 

@@ -1,0 +1,1 @@
+{"db_path":"./assets/binge-tracker.db?_pragma=foreign_keys(1)","socket_path":"/tmp/bingetracker","pipe_path":"\\\\.\\pipe\\bingetracker","script_path":"internal/scripts/fetch_time_pos.js","count_partial_progress":false,"video_player":"mpv"}

@@ -4,25 +4,38 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/mythenox/binge-tracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 
-// bingetracker delete episode Twin Peaks s02e01
+// bingetracker add episode Twin Peaks s02e01 <path>
 
 // episodeCmd represents the episode command
 var addEpisodeCmd = &cobra.Command{
-	Use:   "episode",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:     "episode <show title> <episode identifier> <episode path>",
+	Short:   "Add an episode to a season of a show",
+	Example: "add episode Twin Peaks s02e01 ~/Downloads/twin_peaks_s02_e01.mp4",
+	Args:    cobra.ExactArgs(3),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		showTitle := args[0]
+		episodeIdentifier := args[1]
+		episodePath := args[3]
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add episode called")
+		nums, err := extractFromEpisodeIdentifier(episodeIdentifier)
+		if err != nil {
+			return err
+		}
+
+		seasonNumber, episodeNumber := nums[0], nums[1]
+
+		return handler.HandlerAddEpisode(
+			cmd.Context(),
+			s,
+			seasonNumber,
+			episodeNumber,
+			showTitle,
+			episodePath,
+		)
 	},
 }
 

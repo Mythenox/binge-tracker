@@ -12,14 +12,10 @@ import (
 
 // seasonCmd represents the season command
 var removeSeasonCmd = &cobra.Command{
-	Use:   "season",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "season <show title> <season identifier>",
+	Short: "Removes the specified season from the database.",
+	Long: `This command removes the specified season from the database, along with all of its episodes.
+Usage example: 'bingetracker remove season Twin Peaks s02'`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]

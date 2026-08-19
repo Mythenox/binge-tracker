@@ -17,13 +17,11 @@ import (
 // play next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]
 var nextCmd = &cobra.Command{
 	Use:   "next <show name> [-- player flags] OR play next <show name> <sXX> [-- player flags]",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Plays the next episode of a show",
+	Long: `This command plays the next unwatched episode of the specified show.
+If a season identifier is provided, the command will ignore unwatched episodes that precede that season.
+Arguments can be passed through to the player by use of the '--' separator; all arguments past this separator will be passed to the player.
+Usage example: 'bingetracker play next Twin Peaks -- --mute=yes'`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dashIndex := cmd.ArgsLenAtDash()

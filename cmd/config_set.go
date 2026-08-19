@@ -4,23 +4,45 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"slices"
+	"strings"
 
+	"github.com/mythenox/binge-tracker/internal/handler"
 	"github.com/spf13/cobra"
 )
 
+// bingetracker config set video_player=mpv
+
 // configCmd represents the config command
 var configSetCmd = &cobra.Command{
-	Use:   "set",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "set <key>=<value>",
+	Short: "Set value of certain config settings",
+	Long: `At the moment, this command only allows you to change the values of the count_partial_progress and video_player settings.
+Changing the values of the other settings will completely break the program, so please refrain from doing so.
+The keys and values must be set in <key>=<value> format.
+Usage example: 'bingetracker config set count_partial_progress=true'`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		mutableKeys := []string{"count_partial_progress", "video_player"}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("config set called")
+		configChanges := make(map[string]string)
+		for _, arg := range args {
+			if !strings.Contains(arg, "=") {
+				return errors.New("Input must be of the form key=value")
+			}
+			splitInput := strings.Split(arg, "=")
+			key, value := strings.ToLower(splitInput[0]), strings.ToLower(splitInput[1])
+
+			if !slices.Contains(mutableKeys, key) {
+				return fmt.Errorf("The key %s cannot be altered.", key)
+			}
+
+			configChanges[key] = value
+		}
+
+		return handler.HandlerSetConfig(cmd.Context(), s, configChanges)
 	},
 }
 

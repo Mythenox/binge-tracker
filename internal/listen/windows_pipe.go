@@ -5,16 +5,25 @@ package listen
 import (
 	"fmt"
 	"net"
+	"os"
 	"time"
 
 	"github.com/Microsoft/go-winio"
 )
 
 func connectToPlayer(pipePath string) (net.Conn, error) {
-	fmt.Printf("Connecting to mpv pipe at %s...\n", pipePath)
+	pipeReady := false
+	for range 50 { // try for up to 5 seconds
+		if _, err := os.Stat(pipePath); err == nil {
+			pipeReady = true
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 
-	// Set a timeout duration for the initial connection
-	timeout := 10 * time.Second
+	if !pipeReady {
+		return nil, fmt.Errorf("timed out waiting for mpv pipe at %s", pipePath)
+	}
 
-	return winio.DialPipe(pipePath, &timeout)
+	return winio.DialPipe(pipePath, nil)
 }

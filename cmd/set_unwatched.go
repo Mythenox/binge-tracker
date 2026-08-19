@@ -11,14 +11,10 @@ import (
 
 // unwatchedCmd represents the unwatched command
 var setUnwatchedCmd = &cobra.Command{
-	Use:   "unwatched",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "unwatched <show title> {season or season range | episode or episode range}",
+	Short: "Sets an episode or range of episodes as unwatched",
+	Long: `This command sets an episode or range of episodes as unwatched. Can also input a season or range of seasons to set entire seasons as unwatched in bulk.
+Usage example: 'bingetracker set unwatched Twin Peaks s01-s02'`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		inputIsRange := strings.Contains(args[1], "-")

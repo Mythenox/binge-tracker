@@ -28,7 +28,7 @@ func TrackViewTimeMPV(connPath string) (float64, error) {
 		return 0.0, fmt.Errorf("Error connecting to player: %v", err)
 	}
 
-	fmt.Println("Connected to mpv player...")
+	fmt.Println("Connected to mpv player.")
 
 	defer conn.Close()
 

@@ -9,15 +9,11 @@ import (
 
 // deleteCmd represents the delete command
 var removeCmd = &cobra.Command{
-	Use:     "delete",
+	Use:     "remove",
 	Aliases: []string{"rm"},
-	Short:   "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short:   "Removes a show, season, or episode",
+	Long: `This command does nothing on its own, and must be used with the 'show', 'season', or 'episode' subcommands.
+See the help commands for the respective subcommands for more information their usage.`,
 	Args: cobra.NoArgs,
 }
 

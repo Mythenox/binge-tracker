@@ -1,8 +1,2 @@
-# cloned repo
-/mpv/
-
 # other
 /samples/*
-
-#configs
-*.json

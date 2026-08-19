@@ -11,14 +11,9 @@ import (
 // seasonsCmd represents the seasons command
 var listSeasonsCmd = &cobra.Command{
 	Use:   "seasons <show title>",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(1),
+	Short: "Lists all seasons of the specified show",
+	Long:  `Lists all seasons of the specified show, as well as episode watch progress for each season.`,
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]
 		return handler.HandlerListSeasons(cmd.Context(), s, showTitle)

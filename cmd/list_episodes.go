@@ -14,14 +14,9 @@ import (
 // episodesCmd represents the episodes command
 var episodesCmd = &cobra.Command{
 	Use:   "episodes <show title> <season number>",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(2),
+	Short: "List episodes of a specific season of a show",
+	Long:  `This command lists the viewtime and watched status of all episodes in the specified season.`,
+	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]
 		seasonIdentifier := args[1]

@@ -16,13 +16,9 @@ import (
 // playCmd represents the play command
 var playCmd = &cobra.Command{
 	Use:   "play <show name> <sXXeYY> [-- player_flags]",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Play a specified episode",
+	Long: `Plays the specified episode. Arguments can be passed through to the player by use of the '--' separator; all arguments past this separator will be passed to the player.
+Usage example: 'bingetracker play Twin Peaks s01e01 -- --mute=yes'`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dashIndex := cmd.ArgsLenAtDash()

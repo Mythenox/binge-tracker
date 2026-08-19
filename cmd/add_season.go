@@ -12,15 +12,10 @@ import (
 
 // seasonCmd represents the season command
 var addSeasonCmd = &cobra.Command{
-	Use:   "season",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(3),
+	Use:     "season <show title> <season identifier> <season directory path>",
+	Short:   "Add a new season to an existing show",
+	Example: "add season Twin Peaks s02 '~/Downloads/Twin Peaks Season 2'",
+	Args:    cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]
 		seasonIdentifier := args[1]

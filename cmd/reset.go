@@ -13,14 +13,9 @@ import (
 // resetCmd represents the reset command
 var resetCmd = &cobra.Command{
 	Use:   "reset",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Args: cobra.NoArgs,
+	Short: "Resets the entire database",
+	Long:  `This command removes all shows from the database, along with their respective seasons and episodes.`,
+	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		fmt.Print("The following command will completely reset the database, including all seasons and shows. Continue? (Y/n) ")

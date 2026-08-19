@@ -10,14 +10,10 @@ import (
 
 // showCmd represents the show command
 var removeShowCmd = &cobra.Command{
-	Use:   "show",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "show <show title>",
+	Short: "Removes the specified show from the database.",
+	Long: `This command removes the specified show from the database, along with all of its seasons and episodes.
+Usage example: 'bingetracker remove show Twin Peaks'`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]

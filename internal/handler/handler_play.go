@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/mythenox/binge-tracker/internal/app"
 	"github.com/mythenox/binge-tracker/internal/database"
@@ -128,9 +129,17 @@ func HandlerPlayMPV(
 		restart = true
 	}
 
+	var connPath string
+	operatingSystem := runtime.GOOS
+	if operatingSystem == "windows" {
+		connPath = s.Cfg.PipePath
+	} else {
+		connPath = s.Cfg.SocketPath
+	}
+
 	mpvFlags := []string{
 		episode.Filepath,
-		fmt.Sprintf("--input-ipc-server=%s", s.Cfg.SocketPath),
+		fmt.Sprintf("--input-ipc-server=%s", connPath),
 		fmt.Sprintf("--script=%s", s.Cfg.ScriptPath),
 	}
 	mpvFlags = append(mpvFlags, playerArgs...)
@@ -146,7 +155,7 @@ func HandlerPlayMPV(
 
 	playerCmd := exec.Command("mpv", mpvFlags...)
 
-	_ = os.Remove(s.Cfg.SocketPath)
+	os.Remove(connPath)
 
 	fmt.Printf("Starting s%de%d of %s...\n", seasonNumber, episodeNumber, showTitle)
 
@@ -164,19 +173,7 @@ func HandlerPlayMPV(
 		log.Println("Process exited gracefully on its own.")
 	}()
 
-	/*
-		var connPath string
-		os := runtime.GOOS
-		if os == "windows" {
-			connPath = s.Cfg.PipePath
-		} else {
-			connPath = s.Cfg.SocketPath
-		}
-
-		viewtime, err := listen.TrackViewTimeMPV(connPath)
-	*/
-
-	viewtime, err := listen.TrackViewTimeMPV(s.Cfg.SocketPath)
+	viewtime, err := listen.TrackViewTimeMPV(connPath)
 	if err != nil {
 		return err
 	}

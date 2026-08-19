@@ -1,28 +1,20 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("config called")
-	},
+	Short: "Set value of config settings",
+	Long: `This command does nothing on its own, and can only be used with the 'set' subcommand.
+Usage example:, 'bingetracker set [arguments]'
+See the help command of the 'add' subcommand for more information on its usage.`,
+	Args: cobra.NoArgs,
 }
 
 func init() {

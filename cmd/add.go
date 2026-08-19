@@ -9,14 +9,11 @@ import (
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
-	Use:   "add {season}",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "add",
+	Short: "Add a new season or new episode",
+	Long: `This command does nothing on its own; it must be used with either the 'season' or 'episode' subcommands.
+For example: 'bingetracker add season [arguments]' or 'bingetracker add episode [arguments].
+See the help commands for the respective 'season' and 'episode' subcommands for more information their usage.`,
 	Args: cobra.NoArgs,
 }
 

@@ -15,14 +15,11 @@ import (
 
 // moveCmd represents the move command
 var moveCmd = &cobra.Command{
-	Use:   "move",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "move <show title> <season number> <new directory path>",
+	Short: "Move the target directory of an existing season to a new path",
+	Long: `This command allows for changing the target directory of an existing season.
+If the new target directory has a different number of episodes, user confirmation is required to proceed, as the watch information for the season must be completely reset.
+Usage example: 'bingetracker move Twin Peaks s02 '~/Downloads/Twin Peaks S02'`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		showTitle := args[0]
